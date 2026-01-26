@@ -1,6 +1,16 @@
 import type { Context } from "hono";
 
 class BaseController {
+  continue(c: Context, message = "") {
+    return c.json(
+      {
+        success: true,
+        message: message || "Continue",
+      },
+      100,
+    );
+  }
+
   ok(c: Context, message = "", data = {}) {
     return c.json(
       {
