@@ -8,6 +8,9 @@
 .idea/usage.statistics.xml
 .idea/shelf
 
+# # generated prisma
+# /src/generated/prisma
+
 # deps
 node_modules/
 
