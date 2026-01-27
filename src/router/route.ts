@@ -1,19 +1,31 @@
 import { Hono } from "hono";
 import AuthController from "../core/controller/auth.controller.js";
 import { isAuthenticated } from "../middleware/authentication.js";
+import UsersController from "../core/controller/user.controller.js";
 
-const controller = new AuthController();
+const AuthControl = new AuthController();
+const UserControl = new UsersController();
+
 const Auth = new Hono()
-  .post("/login", controller.login)
-  .post("/register", controller.register)
-  .post("/refresh", controller.refresh) // ada auto refresh
+  .post("/login", AuthControl.login)
+  .post("/register", AuthControl.register)
+  .post("/refresh", AuthControl.refresh)
   .use("/logout", isAuthenticated())
-  .post("/logout", controller.logout);
+  .post("/logout", AuthControl.logout);
 
 const StudentClass = new Hono()
   .use("/*", isAuthenticated())
   .post("/message", (c) => c.text("hello world!"));
 
+  
+const Users = new Hono()
+  .use("/*", isAuthenticated())
+  .get("/get-all", UserControl.getAll)
+  .get("/get-one/:id", UserControl.getOne)
+  .put("/update/:id", UserControl.Update);
+
 export const Routes = new Hono()
   .route("/auth", Auth)
-  .route("/class", StudentClass);
+  .route("/class", StudentClass)
+  .route("/user", Users);
+

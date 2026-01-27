@@ -209,7 +209,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/matalima/Code/Sekolah/KK2/foursense-hono-server/src/generated/prisma",
+      "value": "C:\\laragon\\www\\hono-server\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -218,16 +218,20 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "debian-openssl-3.0.x",
+        "value": "windows",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "windows"
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/matalima/Code/Sekolah/KK2/foursense-hono-server/prisma/schema.prisma",
+    "sourceFilePath": "C:\\laragon\\www\\hono-server\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -246,8 +250,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel users {\n  id                String          @id @default(uuid())\n  name              String\n  email             String          @unique\n  email_verified_at DateTime?\n  password          String\n  role              Role            @default(unregistered)\n  studentClasses    student_class[]\n  createdAt         DateTime        @default(now())\n  updatedAt         DateTime        @updatedAt\n}\n\nmodel student_class {\n  id        String       @id @default(uuid())\n  user_id   String\n  class_id  String\n  nis       Int\n  absences  absences[]\n  todos     todo_lists[]\n  createdAt DateTime     @default(now())\n  updatedAt DateTime     @updatedAt\n\n  user  users   @relation(fields: [user_id], references: [id])\n  class classes @relation(fields: [class_id], references: [id])\n}\n\nmodel absences {\n  id               String   @id @default(uuid())\n  student_class_id String\n  date             DateTime\n  absence_time     DateTime\n  status           Status   @default(unexcused)\n  has_todo         Boolean  @default(false)\n\n  studentClass student_class @relation(fields: [student_class_id], references: [id])\n}\n\nmodel todo_lists {\n  id               String    @id @default(uuid())\n  student_class_id String\n  date             DateTime\n  activity         String\n  submitted_at     DateTime?\n\n  studentClass student_class @relation(fields: [student_class_id], references: [id])\n}\n\nmodel classes {\n  id             String          @id @default(uuid())\n  className      String\n  academicYear   String\n  studentClasses student_class[]\n  createdAt      DateTime        @default(now())\n  updatedAt      DateTime        @updatedAt\n}\n\nenum Role {\n  admin\n  teacher\n  student\n  unregistered\n}\n\nenum Status {\n  present\n  onLeave\n  ill\n  unexcused\n}\n",
-  "inlineSchemaHash": "9b3db31fa4c294b9e62c730adf9d4844ef6860f5552a189a42b5b9ab0ce91489",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/prisma\"\n  binaryTargets = [\"native\", \"windows\"]\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel users {\n  id                String          @id @default(uuid())\n  name              String\n  email             String          @unique\n  email_verified_at DateTime?\n  password          String\n  role              Role            @default(unregistered)\n  studentClasses    student_class[]\n  createdAt         DateTime        @default(now())\n  updatedAt         DateTime        @updatedAt\n}\n\nmodel student_class {\n  id        String       @id @default(uuid())\n  user_id   String\n  class_id  String\n  nis       Int\n  absences  absences[]\n  todos     todo_lists[]\n  createdAt DateTime     @default(now())\n  updatedAt DateTime     @updatedAt\n\n  user  users   @relation(fields: [user_id], references: [id])\n  class classes @relation(fields: [class_id], references: [id])\n}\n\nmodel absences {\n  id               String   @id @default(uuid())\n  student_class_id String\n  date             DateTime\n  absence_time     DateTime\n  status           Status   @default(unexcused)\n  has_todo         Boolean  @default(false)\n\n  studentClass student_class @relation(fields: [student_class_id], references: [id])\n}\n\nmodel todo_lists {\n  id               String    @id @default(uuid())\n  student_class_id String\n  date             DateTime\n  activity         String\n  submitted_at     DateTime?\n\n  studentClass student_class @relation(fields: [student_class_id], references: [id])\n}\n\nmodel classes {\n  id             String          @id @default(uuid())\n  className      String\n  academicYear   String\n  studentClasses student_class[]\n  createdAt      DateTime        @default(now())\n  updatedAt      DateTime        @updatedAt\n}\n\nenum Role {\n  admin\n  teacher\n  student\n  unregistered\n}\n\nenum Status {\n  present\n  onLeave\n  ill\n  unexcused\n}\n",
+  "inlineSchemaHash": "462323f6d1137f4c6eaaad4cd4a5f2cb00b5a5ddd17a5ef9f56609c3e889c63a",
   "copyEngine": true
 }
 config.dirname = '/'
