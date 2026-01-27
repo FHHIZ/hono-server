@@ -1,3 +1,23 @@
-Khusus pengguna Windows, tambahkan `binaryTargets = ["native", "windows"]` di `schema.prisma`
-Jalankan `npx prisma generate` sebelum memulai
-lalu pastikan variabel `DATABASE_URL`, `ACCESS_SECRET`, dan `REFRESH_SECRET` sudah terisi di dalam `.env`
+1. **Khusus pengguna Windows**
+   Tambahkan konfigurasi berikut pada file `schema.prisma` :
+
+   binaryTargets = ["native", "windows"]
+
+2. Jalankan perintah berikut untuk menghasilkan Prisma Client:
+
+   npx prisma generate
+
+3. Pastikan variabel lingkungan berikut sudah terisi di dalam file `.env`:
+
+   `DATABASE_URL`
+   `ACCESS_SECRET`
+   `REFRESH_SECRET`
+
+4. Jika tabel belum tersedia di database, jalankan proses migrasi dan seeding database.
+
+   npm prisma migrate dev
+   npx prisma db seed
+
+5. Jalankan backend dengan perintah:
+
+   npm run dev
