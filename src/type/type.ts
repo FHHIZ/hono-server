@@ -21,8 +21,15 @@ export type token = {
   role: string;
 };
 
-export type updateRequest = {
+export type UserUpdateRequest = {
   name: string;
+  email: string;
+  password: string;
+  role: Role;
+};
+
+export type todoCreateRequest = {
+  activity: string;
   email: string;
   password: string;
   role: Role;
