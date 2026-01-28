@@ -1,3 +1,5 @@
+import type { Role } from "../generated/prisma/index.js";
+
 export type LoginBody = {
   email: string;
   password: string;
@@ -17,4 +19,11 @@ export type token = {
   nbf: string;
   id: string;
   role: string;
+};
+
+export type updateRequest = {
+  name: string;
+  email: string;
+  password: string;
+  role: Role;
 };
