@@ -15,8 +15,8 @@ const Auth = new Hono()
   .get("/logout", isAuthenticated(), AuthControl.logout)
   .get("/me", isAuthenticated(), AuthControl.me)
   .post("/change-password", isAuthenticated(), AuthControl.changePassword)
-  .post("/forgot-password", isAuthenticated(), AuthControl.logout)
-  // .post("/reset-password", isAuthenticated(), AuthControl.resetPassword);
+  .post("/forgot-password", isAuthenticated(), AuthControl.logout);
+// .post("/reset-password", isAuthenticated(), AuthControl.resetPassword);
 
 const StudentClass = new Hono()
   .use("/*", isAuthenticated())
@@ -36,8 +36,6 @@ const Class = new Hono()
 
 export const Routes = new Hono()
   .route("/auth", Auth)
-  .route("/studenclass", StudentClass)
+  .route("/studentClass", StudentClass)
   .route("/user", Users)
   .route("/class", Class);
-
-
