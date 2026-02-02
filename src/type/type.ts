@@ -37,3 +37,14 @@ export type todoCreateRequest = {
   password: string;
   role: Role;
 };
+
+
+export type createClass = {
+  className: string;
+  academicYear: string;
+};
+
+export type updateClass = {
+  className: string;
+  academicYear: string;
+};
