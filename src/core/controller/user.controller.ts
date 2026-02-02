@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import BaseController from "../../base/controller.base.js";
 import { AuthService } from "../service/auth.service.js";
-import type { updateRequest } from "../../type/type.js";
+import type { UserUpdateRequest } from "../../type/type.js";
 
 class UsersController extends BaseController {
   constructor() {
@@ -40,7 +40,7 @@ class UsersController extends BaseController {
     Update = async (c: Context) => {
       try {
         const id: string = c.req.param('id')
-        const body = await c.req.json<updateRequest>();
+        const body = await c.req.json<UserUpdateRequest>();
 
         if (!id) {
         return this.badRequest(c, "User id is required")

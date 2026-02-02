@@ -1,13 +1,46 @@
 import { prisma } from "../../middleware/client.js";
-import type { updateRequest } from "../../type/type.js";
+import type {
+  resetPasswordRequest,
+  UserUpdateRequest,
+} from "../../type/type.js";
 
 export const AuthService = {
   findByEmail: (email: string) => {
-    return prisma.users.findUnique({ where: { email } });
+    return prisma.users.findUnique({
+      where: { email },
+      omit: {
+        email_verified_at: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   },
 
   findById: (data: string) => {
-    return prisma.users.findUnique({ where: { id: data } });
+    return prisma.users.findUnique({
+      where: { id: data },
+      omit: {
+        email_verified_at: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  },
+
+  findByIdForPassword: (data: string) => {
+    return prisma.users.findUnique({
+      where: { id: data },
+      omit: {
+        id: true,
+        name: true,
+        role: true,
+        email: true,
+        email_verified_at: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   },
 
   register: (data: { name: string; email: string; password: string }) => {
@@ -20,25 +53,53 @@ export const AuthService = {
         ? {
             name: {
               contains: query,
-            }
+            },
           }
         : undefined,
-      omit: { password: true, createdAt: true, updatedAt: true, email_verified_at: true}
-    })
+      omit: {
+        email_verified_at: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   },
 
-    findOneUser: (id: string) => {
+  findOneUser: (id: string) => {
     return prisma.users.findMany({
       where: { id: id },
-      omit: { password: true, createdAt: true, updatedAt: true, email_verified_at: true}
-    })
+      omit: {
+        email_verified_at: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   },
 
-  updateUser: (id: string, body: updateRequest) => {
+  updatePassword: (id: string, body: resetPasswordRequest) => {
     return prisma.users.update({
-      where: {id: id},
+      where: { id: id },
       data: body,
-      omit: { password: true, createdAt: true, updatedAt: true, email_verified_at: true}
-    })
+      omit: {
+        email_verified_at: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  },
+
+  updateUser: (id: string, body: UserUpdateRequest) => {
+    return prisma.users.update({
+      where: { id: id },
+      data: body,
+      omit: {
+        email_verified_at: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   },
 };

@@ -40,7 +40,7 @@ class BaseController {
     return c.json(
       {
         success: false,
-        message: message || "Unauthorized ",
+        message: message || "Unauthorized",
       },
       401,
     );

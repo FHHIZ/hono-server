@@ -9,15 +9,17 @@ const UserControl = new UsersController();
 const Auth = new Hono()
   .post("/login", AuthControl.login)
   .post("/register", AuthControl.register)
-  .post("/refresh", AuthControl.refresh)
-  .use("/logout", isAuthenticated())
-  .post("/logout", AuthControl.logout);
+  .get("/refresh", AuthControl.refresh)
+  .get("/logout", isAuthenticated(), AuthControl.logout)
+  .get("/me", isAuthenticated(), AuthControl.me)
+  .post("/change-password", isAuthenticated(), AuthControl.changePassword)
+  .post("/forgot-password", isAuthenticated(), AuthControl.logout)
+  // .post("/reset-password", isAuthenticated(), AuthControl.resetPassword);
 
 const StudentClass = new Hono()
   .use("/*", isAuthenticated())
   .post("/message", (c) => c.text("hello world!"));
 
-  
 const Users = new Hono()
   .use("/*", isAuthenticated())
   .get("/get-all", UserControl.getAll)
@@ -28,4 +30,3 @@ export const Routes = new Hono()
   .route("/auth", Auth)
   .route("/class", StudentClass)
   .route("/user", Users);
-

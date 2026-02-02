@@ -21,10 +21,13 @@ export type token = {
   role: string;
 };
 
+export type resetPasswordRequest = {
+  password: string;
+};
+
 export type UserUpdateRequest = {
   name: string;
   email: string;
-  password: string;
   role: Role;
 };
 
