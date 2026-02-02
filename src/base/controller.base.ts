@@ -1,6 +1,16 @@
 import type { Context } from "hono";
 
 class BaseController {
+  continue(c: Context, message = "") {
+    return c.json(
+      {
+        success: true,
+        message: message || "Continue",
+      },
+      100,
+    );
+  }
+
   ok(c: Context, message = "", data = {}) {
     return c.json(
       {
@@ -30,7 +40,7 @@ class BaseController {
     return c.json(
       {
         success: false,
-        message: message || "Unauthorized ",
+        message: message || "Unauthorized",
       },
       401,
     );
