@@ -1,8 +1,5 @@
 import { prisma } from "../../middleware/client.js";
-import type {
-  resetPasswordRequest,
-  UserUpdateRequest,
-} from "../../type/type.js";
+import type { UserUpdateRequest } from "../../type/type.js";
 
 export const AuthService = {
   findByEmail: (email: string) => {
@@ -36,6 +33,19 @@ export const AuthService = {
         name: true,
         role: true,
         email: true,
+        email_verified_at: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  },
+
+  findByEmailForPassword: (data: string) => {
+    return prisma.users.findUnique({
+      where: { email: data },
+      omit: {
+        password: true,
+        name: true,
         email_verified_at: true,
         createdAt: true,
         updatedAt: true,
@@ -77,7 +87,7 @@ export const AuthService = {
     });
   },
 
-  updatePassword: (id: string, body: resetPasswordRequest) => {
+  updatePassword: (id: string, body: { password: string }) => {
     return prisma.users.update({
       where: { id: id },
       data: body,

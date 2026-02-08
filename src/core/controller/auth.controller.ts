@@ -7,11 +7,7 @@ import {
   refreshSession,
   resetSession,
 } from "../../helpers/jwt.js";
-import {
-  getRefreshCookie,
-  removeRefreshCookie,
-  setRefreshCookie,
-} from "../../helpers/cookies.js";
+import { getRefreshCookie } from "../../helpers/cookies.js";
 import type { LoginBody, RegisterBody } from "../../type/type.js";
 
 class AuthController extends BaseController {
@@ -37,10 +33,7 @@ class AuthController extends BaseController {
       role: usr.role,
     });
 
-    setRefreshCookie(c, refreshToken);
-    c.header("X-Access-Token", accessToken);
-
-    return this.ok(c, "Successfully Login");
+    return this.ok(c, "Successfully Login", { accessToken, refreshToken });
   };
 
   register = async (c: Context) => {
@@ -61,31 +54,21 @@ class AuthController extends BaseController {
       role: res.role,
     });
 
-    setRefreshCookie(c, refreshToken);
-    c.header("X-Access-Token", accessToken);
-
-    return this.ok(c, "Successfully Register");
+    return this.ok(c, "Successfully Register", { accessToken, refreshToken });
   };
 
   refresh = async (c: Context) => {
     const token = getRefreshCookie(c);
+    console.log(token);
     if (!token) return this.unauthorized(c);
     const { accessToken, refreshToken } = await refreshSession(token);
-
-    setRefreshCookie(c, refreshToken);
-    c.header("X-Access-Token", accessToken);
-
-    return this.ok(c, "Successfully Refresh");
-  };
-
-  logout = async (c: Context) => {
-    removeRefreshCookie(c);
-    return this.noContent(c);
+    console.log(accessToken && refreshToken ? true : false);
+    return this.ok(c, "Successfully Refresh", { accessToken, refreshToken });
   };
 
   me = async (c: Context) => {
     try {
-      const id = c.get("jwtPayload");
+      const id = c.get("jwtPayloadId");
       const data = await AuthService.findById(id);
       return this.ok(c, "Success Show Me", data!);
     } catch (error) {
@@ -95,47 +78,60 @@ class AuthController extends BaseController {
 
   changePassword = async (c: Context) => {
     try {
-      const id = c.get("jwtPayload");
+      const id: string = c.get("jwtPayloadId");
+      const role: string = c.get("jwtPayloadRole");
 
-      const body = await c.req.json<{ password: string }>();
-      const { password } = body;
+      const body = await c.req.json<{ oldPassword: string }>();
+      const { oldPassword } = body;
 
       const usr = await AuthService.findByIdForPassword(id);
       if (!usr) return this.badRequest(c, "Invalid action");
-      const isMatch = await bcrypt.compare(password, usr.password);
+      const isMatch = await bcrypt.compare(oldPassword, usr.password);
       if (!isMatch) return this.badRequest(c, "Invalid password");
 
-      const tempToken = (await generateTokens(id)).tempToken;
+      const tempToken = (await generateTokens({ id, role })).tempToken;
 
       c.header("x-reset-token", tempToken);
-      return this.noContent(c);
+      return this.ok(c, "Granted access to reset password");
     } catch (error) {
       return this.badRequest(c, error as string);
     }
   };
 
+  // forgetPassword = async (c: Context) => {
+  //   try {
+  //     const body = await c.req.json<{ email: string }>();
+  //     const usr = await AuthService.findByEmailForPassword(body.email);
+  //     if (!usr) return this.badRequest(c, "Invalid action");
+  //     const tempToken = await generateTokens({ id: usr.id, role: usr.role });
+  //     await sendEmail(usr.email, "Reset Password", Email(tempToken));
+  //     // return email(tempToken.tempToken);
+  //   } catch (error) {
+  //     return this.badRequest(c, "Invalid");
+  //   }
+  // };
+
   resetPassword = async (c: Context) => {
-    // try {
-    const token = c.req.header("x-reset-token");
-    if (!token)
-      return this.unauthorized(
-        c,
-        "Use change password or forget password first!",
-      );
+    try {
+      const token = c.req.header("x-reset-token");
+      const body = await c.req.json<{ newPassword: string }>();
+      if (!token)
+        return this.unauthorized(
+          c,
+          "Use change password or forget password first!",
+        );
 
-    const isVerify = await resetSession(token);
-    if (!isVerify) return this.unauthorized(c, "Reset Session End!");
+      const isVerify = await resetSession(token);
+      if (!isVerify.id) return this.unauthorized(c, "Reset Session End!");
 
-    return { isVerify };
-
-    //   const body = await c.req.json<{ password: string }>();
-    //   const { password } = body;
-
-    //   await AuthService.updatePassword(isVerify.data.id, { password });
-    //   return this.ok(c, "Success Update Password");
-    // } catch (error) {
-    //   return this.badRequest(c, `${error as string} ${isVerify.data.id}`);
-    // }
+      const pss = await bcrypt.hash(body.newPassword, 12);
+      const res = await AuthService.updatePassword(isVerify.id, {
+        password: pss,
+      });
+      return this.ok(c, "Successfuly change password", res);
+    } catch (error) {
+      return this.badRequest(c, `${error as string}`);
+    }
   };
 }
 

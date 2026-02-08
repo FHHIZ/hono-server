@@ -22,7 +22,8 @@ export const isAuthenticated = (requiredRole?: string) => {
       }
 
       // 3. Simpan untuk context (data yang bisa digunakan setelah logic ini)
-      c.set("jwtPayload", payload.data.id);
+      c.set("jwtPayloadId", payload.data.id);
+      c.set("jwtPayloadRole", payload.data.role);
       await next();
     } catch (e) {
       return res.unauthorized(c);

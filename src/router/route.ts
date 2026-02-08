@@ -4,21 +4,22 @@ import { isAuthenticated } from "../middleware/authentication.js";
 import UsersController from "../core/controller/user.controller.js";
 import ClassController from "../core/controller/class.controller.js";
 import AbsenController from "../core/controller/absences.controller.js";
+import HTMLController from "../core/controller/tsx/html.controller.js";
 
 const AuthControl = new AuthController();
 const UserControl = new UsersController();
 const ClassControl = new ClassController();
 const AbsenControl = new AbsenController();
+const HTMLOnlyControl = new HTMLController();
 
 const Auth = new Hono()
   .post("/login", AuthControl.login)
   .post("/register", AuthControl.register)
   .get("/refresh", AuthControl.refresh)
-  .get("/logout", isAuthenticated(), AuthControl.logout)
   .get("/me", isAuthenticated(), AuthControl.me)
   .post("/change-password", isAuthenticated(), AuthControl.changePassword)
-  .post("/forgot-password", isAuthenticated(), AuthControl.logout);
-// .post("/reset-password", isAuthenticated(), AuthControl.resetPassword);
+  .post("/forgot-password", HTMLOnlyControl.forgetPassword)
+  .post("/reset-password", isAuthenticated(), AuthControl.resetPassword);
 
 const StudentClass = new Hono()
   .use("/*", isAuthenticated())

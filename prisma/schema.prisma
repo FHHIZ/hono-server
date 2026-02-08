@@ -44,8 +44,8 @@ model student_class {
 model absences {
   id               String   @id @default(uuid())
   student_class_id String
-  date             DateTime
-  absence_time     DateTime
+  date             DateTime? @default(now())
+  absence_time     DateTime? @default(now())
   status           Status   @default(unexcused)
   has_todo         Boolean  @default(false)
 
