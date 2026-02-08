@@ -3,10 +3,12 @@ import AuthController from "../core/controller/auth.controller.js";
 import { isAuthenticated } from "../middleware/authentication.js";
 import UsersController from "../core/controller/user.controller.js";
 import ClassController from "../core/controller/class.controller.js";
+import AbsenController from "../core/controller/absences.controller.js";
 
 const AuthControl = new AuthController();
 const UserControl = new UsersController();
 const ClassControl = new ClassController();
+const AbsenControl = new AbsenController();
 
 const Auth = new Hono()
   .post("/login", AuthControl.login)
@@ -34,8 +36,15 @@ const Class = new Hono()
   .put("/update/:id", ClassControl.Update)
   .post("/create", ClassControl.createClass);
 
+const Absences = new Hono()
+  .get("/get-all", AbsenControl.getAll)
+  .get("/get-one/:id", AbsenControl.getOne)
+  .put("/update/:id", AbsenControl.Update)
+  .post("/create", AbsenControl.createAbsen);
+
 export const Routes = new Hono()
   .route("/auth", Auth)
   .route("/studentClass", StudentClass)
   .route("/user", Users)
-  .route("/class", Class);
+  .route("/class", Class)
+  .route("/absen", Absences);

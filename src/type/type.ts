@@ -1,4 +1,4 @@
-import type { Role } from "../generated/prisma/index.js";
+import { Status, type Role } from "../generated/prisma/index.js";
 
 export type LoginBody = {
   email: string;
@@ -47,4 +47,13 @@ export type createClass = {
 export type updateClass = {
   className: string;
   academicYear: string;
+};
+
+
+export type createAbsen = {
+  status: Status;
+};
+
+export type updateAbsen = {
+  status: Status;
 };
