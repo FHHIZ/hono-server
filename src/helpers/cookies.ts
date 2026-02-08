@@ -19,6 +19,6 @@ export function removeRefreshCookie(c: Context) {
   return deleteCookie(c, "rftkn", {
     path: "/",
     secure: true,
-    sameSite: "None"
+    sameSite: "None",
   });
 }

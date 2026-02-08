@@ -22,7 +22,7 @@ export type token = {
 };
 
 export type resetPasswordRequest = {
-  password: string;
+  newPassword: string;
 };
 
 export type UserUpdateRequest = {
@@ -38,7 +38,6 @@ export type todoCreateRequest = {
   role: Role;
 };
 
-
 export type createClass = {
   className: string;
   academicYear: string;
@@ -47,4 +46,9 @@ export type createClass = {
 export type updateClass = {
   className: string;
   academicYear: string;
+};
+
+export type ResetPayload = {
+  id: string;
+  exp: number;
 };

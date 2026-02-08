@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import BaseController from "../../base/controller.base.js";
-import type { createClass, updateClass, updateRequest } from "../../type/type.js";
+import type { createClass, updateClass } from "../../type/type.js";
 import { ClassService } from "../service/class.service.js";
 
 class ClassController extends BaseController {
