@@ -1,5 +1,5 @@
 import { prisma } from "../../middleware/client.js";
-import type { createClass, updateClass, updateRequest } from "../../type/type.js";
+import type { updateClass } from "../../type/type.js";
 
 export const ClassService = {
   findById: (data: string) => {
