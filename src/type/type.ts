@@ -51,11 +51,14 @@ export type updateClass = {
 
 export type createAbsen = {
   status: Status;
+  student_class_id: string;
 };
 
 export type updateAbsen = {
   status: Status;
+  student_class_id: string;
 };
+
 export type ResetPayload = {
   id: string;
   exp: number;

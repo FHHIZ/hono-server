@@ -7,8 +7,8 @@ export const AbsencesService = {
     return prisma.absences.findUnique({ where: { id: data } });
   },
 
-  createAbsen: (data: { status: Status }) => {
-    // return prisma.absences.create({ data });
+  createAbsen: (data: { student_class_id: string, status: Status }) => {
+    return prisma.absences.create({ data });
   },
 
   findAllAbsen: (query?: Status|undefined) => {
