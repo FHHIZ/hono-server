@@ -59,10 +59,8 @@ class AuthController extends BaseController {
 
   refresh = async (c: Context) => {
     const token = getRefreshCookie(c);
-    console.log(token);
     if (!token) return this.unauthorized(c);
     const { accessToken, refreshToken } = await refreshSession(token);
-    console.log(accessToken && refreshToken ? true : false);
     return this.ok(c, "Successfully Refresh", { accessToken, refreshToken });
   };
 
