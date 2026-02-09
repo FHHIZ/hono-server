@@ -50,7 +50,7 @@ class BaseController {
     return c.json(
       {
         success: false,
-        message: message || "Forbidden ",
+        message: message || "Forbidden",
       },
       403,
     );

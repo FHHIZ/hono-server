@@ -1,10 +1,10 @@
-import BaseController from "../../../base/controller.base.js";
-import { AuthService } from "../../service/auth.service.js";
-import { generateTokens } from "../../../helpers/jwt.js";
+import BaseController from "../../base/controller.base.js";
+import { AuthService } from "./auth.service.js";
+import { generateTokens } from "../../helpers/jwt.js";
 
-import { sendEmail } from "../../../helpers/mail.js";
+import { sendEmail } from "../../helpers/mail.js";
 import type { Context } from "hono";
-import { EmailResetTemplate } from "../../../view/email.js";
+import { EmailResetTemplate } from "../../view/email.js";
 import { UAParser } from "ua-parser-js";
 
 class HTMLController extends BaseController {
@@ -29,21 +29,26 @@ class HTMLController extends BaseController {
       const formattedTime = new Intl.DateTimeFormat("id-ID", {
         dateStyle: "long",
         timeStyle: "short",
-        timeZone: "Asia/Jakarta", // Pastikan ke WIB
+        timeZone: "Asia/Jakarta",
       }).format(now);
+
+      let deviceInfo = "";
+
+      if (uaResult.browser.name && uaResult.os.name) {
+        deviceInfo = `${uaResult.browser.name} di ${uaResult.os.name}`;
+      } else if (uaResult.device.model) {
+        deviceInfo = uaResult.device.model;
+      } else {
+        deviceInfo = uaResult.ua;
+      }
 
       const html = await EmailResetTemplate({
         token: tempToken,
         email: usr.email,
         time: formattedTime,
-        reqInfo:
-          `${uaResult.browser.name} di ${uaResult.os.name}` ||
-          uaResult.device.model ||
-          uaResult.ua,
+        reqInfo: deviceInfo,
       });
       return await sendEmail(c, usr.email, "Reset Password", `${html}`);
-      // return c.html(`${html}`);
-      // return c.json(uaResult);x`
     } catch (error) {
       return this.badRequest(c, error as string);
     }

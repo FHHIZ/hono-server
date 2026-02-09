@@ -12,7 +12,7 @@
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "fs": "^0.0.1-security",
-    "hono": "^4.11.5",
+    "hono": "^4.11.9",
     "nodemailer": "^7.0.13",
     "pg": "^8.17.2",
     "ua-parser-js": "^2.0.9"

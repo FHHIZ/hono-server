@@ -1,51 +1,15 @@
 import { Hono } from "hono";
-import AuthController from "../core/controller/auth.controller.js";
-import { isAuthenticated } from "../middleware/authentication.js";
-import UsersController from "../core/controller/user.controller.js";
-import ClassController from "../core/controller/class.controller.js";
-import AbsenController from "../core/controller/absences.controller.js";
-import HTMLController from "../core/controller/tsx/html.controller.js";
-
-const AuthControl = new AuthController();
-const UserControl = new UsersController();
-const ClassControl = new ClassController();
-const AbsenControl = new AbsenController();
-const HTMLOnlyControl = new HTMLController();
-
-const Auth = new Hono()
-  .post("/login", AuthControl.login)
-  .post("/register", AuthControl.register)
-  .get("/refresh", AuthControl.refresh)
-  .get("/me", isAuthenticated(), AuthControl.me)
-  .post("/change-password", isAuthenticated(), AuthControl.changePassword)
-  .post("/forgot-password", HTMLOnlyControl.forgetPassword)
-  .post("/reset-password", isAuthenticated(), AuthControl.resetPassword);
-
-const StudentClass = new Hono()
-  .use("/*", isAuthenticated())
-  .post("/message", (c) => c.text("hello world!"));
-
-const Users = new Hono()
-  .use("/*", isAuthenticated())
-  .get("/get-all", UserControl.getAll)
-  .get("/get-one/:id", UserControl.getOne)
-  .put("/update/:id", UserControl.Update);
-
-const Class = new Hono()
-  .get("/get-all", ClassControl.getAll)
-  .get("/get-one/:id", ClassControl.getOne)
-  .put("/update/:id", ClassControl.Update)
-  .post("/create", ClassControl.createClass);
-
-const Absences = new Hono()
-  .get("/get-all", AbsenControl.getAll)
-  .get("/get-one/:id", AbsenControl.getOne)
-  .put("/update/:id", AbsenControl.Update)
-  .post("/create", AbsenControl.createAbsen);
+import { AuthRoute } from "../core/auth/auth.route.js";
+import { StudentRoute } from "../core/student/student.route.js";
+import { UserRoute } from "../core/user/user.route.js";
+import { ClassRoute } from "../core/class/class.route.js";
+import { AbsencesRoute } from "../core/absence/absences.route.js";
+import { TodosRoute } from "../core/todo-list/todos.route.js";
 
 export const Routes = new Hono()
-  .route("/auth", Auth)
-  .route("/studentClass", StudentClass)
-  .route("/user", Users)
-  .route("/class", Class)
-  .route("/absen", Absences);
+  .route("/auth", AuthRoute)
+  .route("/user", UserRoute)
+  .route("/student", StudentRoute)
+  .route("/class", ClassRoute)
+  .route("/todos", TodosRoute)
+  .route("/absen", AbsencesRoute);
