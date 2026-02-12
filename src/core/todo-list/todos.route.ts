@@ -6,5 +6,5 @@ const TC = new TodosController();
 export const TodosRoute = new Hono()
   .get("/get-all", isAuthenticated(), TC.getAll)
   .get("/get-one/:id", isAuthenticated(), TC.getOne)
-  .get("/create", isAuthenticated(), TC.Create)
+  .post("/create", isAuthenticated(), TC.Create)
   .put("/update/:id", isAuthenticated(), TC.Update);

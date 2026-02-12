@@ -4,12 +4,11 @@ import type { AbsenceType } from "../../type/type.js";
 
 export const AbsencesService = {
   findById: (id: string) => {
-    return prisma.absence.findUnique({ where: { id: id } });
-  },
-
-  createAbsence: (body: AbsenceType) => {
-    return prisma.absence.create({
-      data: { student_class_id: body.student_class_id, status: body.status },
+    return prisma.absence.findUnique({
+      where: { id: id },
+      select: {
+        id: true,
+      },
     });
   },
 
@@ -22,6 +21,30 @@ export const AbsencesService = {
             },
           }
         : undefined,
+      select: {
+        id: true,
+        status: true,
+        has_todo: true,
+        absence_time: true,
+        student: { select: { user: { select: { name: true } } } },
+      },  
+    });
+  },
+
+  createAbsence: (body: AbsenceType) => {
+    return prisma.absence.create({
+      data: {
+        student_class_id: body.student_id,
+        status: body.status,
+        has_todo: body.has_todo || undefined,
+      },
+      select: {
+        id: true,
+        status: true,
+        has_todo: true,
+        absence_time: true,
+        student: { select: { user: { select: { name: true } } } },
+      },
     });
   },
 
@@ -34,7 +57,18 @@ export const AbsencesService = {
   updateAbsence: (id: string, body: AbsenceType) => {
     return prisma.absence.update({
       where: { id: id },
-      data: { student_class_id: body.student_class_id, status: body.status },
+      data: {
+        student_class_id: body.student_id,
+        status: body.status,
+        has_todo: body.has_todo || undefined,
+      },
+      select: {
+        id: true,
+        status: true,
+        has_todo: true,
+        absence_time: true,
+        student: { select: { user: { select: { name: true } } } },
+      },
     });
   },
 };

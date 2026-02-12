@@ -4,7 +4,7 @@ import type { UserUpdateType } from "../../type/type.js";
 export const UserService = {
   findByEmail: (email: string) => {
     return prisma.users.findUnique({
-      where: { email },
+      where: { email: email },
       omit: {
         email_verified_at: true,
         createdAt: true,
@@ -53,7 +53,6 @@ export const UserService = {
             nis: true,
             absences: {
               select: {
-                date: true,
                 absence_time: true,
                 status: true,
                 has_todo: true,

@@ -59,7 +59,7 @@ class ClassController extends BaseController {
         };
 
         const res = await ClassService.createClass(data);
-        return this.ok(c, "Successfully createClass.", res);
+        return this.ok(c, "Successfully create class.", res);
       } else {
         return this.badRequest(c, "Please insert className, and academicYear.");
       }

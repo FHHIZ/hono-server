@@ -38,7 +38,7 @@ export type UserUpdateType = {
 };
 
 export type TodosType = {
-  student_class_id: string;
+  student_id: string;
   activity: string;
 };
 
@@ -55,8 +55,9 @@ export type ClassQuery = {
 };
 
 export type AbsenceType = {
-  student_class_id: string;
+  student_id: string;
   status: Status;
+  has_todo?: boolean;
 };
 
 export type StudentType = {
