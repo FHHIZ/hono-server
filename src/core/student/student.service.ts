@@ -28,7 +28,8 @@ export const StudentService = {
         id: true,
         nis: true,
         class: { select: { classes: true, major: true } },
-        user: { select: { name: true } },
+        user: { select: { name: true, email: true } },
+        _count: { select: { absences: true } },
       },
     });
   },
@@ -36,8 +37,13 @@ export const StudentService = {
   findOneStudent: (id: string) => {
     return prisma.student.findMany({
       where: { id: id },
-
-      omit: { createdAt: true, updatedAt: true },
+      select: {
+        id: true,
+        nis: true,
+        class: { select: { classes: true, major: true } },
+        user: { select: { name: true, email: true } },
+        absences: { select: { status: true } },
+      },
     });
   },
 
