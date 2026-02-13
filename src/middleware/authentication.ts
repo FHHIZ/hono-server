@@ -1,10 +1,11 @@
 import type { Context, Next } from "hono";
 import BaseController from "../base/controller.base.js";
 import { accessSession } from "../helpers/jwt.js";
+import type { Role } from "../generated/prisma/index.js";
 
 const res = new BaseController();
 
-export const isAuthenticated = (requiredRole?: string) => {
+export const isAuthenticated = (requiredRole?: Role[]) => {
   return async (c: Context, next: Next) => {
     const authHeader = c.req.header("Authorization");
     const accessToken = authHeader?.split(" ")[1];
@@ -16,7 +17,10 @@ export const isAuthenticated = (requiredRole?: string) => {
 
       // 2. Cek syarat role
       if (requiredRole) {
-        if (payload.data.role !== requiredRole) {
+        if (
+          payload.data.role !== "admin" &&
+          !requiredRole.includes(payload.data.role as Role)
+        ) {
           return res.forbidden(c);
         }
       }

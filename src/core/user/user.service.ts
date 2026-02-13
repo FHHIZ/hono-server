@@ -1,0 +1,80 @@
+import { prisma } from "../../middleware/client.js";
+import type { UserUpdateType } from "../../type/type.js";
+
+export const UserService = {
+  findByEmail: (email: string) => {
+    return prisma.users.findUnique({
+      where: { email },
+      omit: {
+        email_verified_at: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  },
+
+  findById: (id: string) => {
+    return prisma.users.findUnique({
+      where: { id: id },
+      omit: {
+        email_verified_at: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  },
+
+  findAllUser: (query?: string) => {
+    return prisma.users.findMany({
+      where: query
+        ? {
+            name: {
+              contains: query,
+            },
+          }
+        : undefined,
+      omit: {
+        email_verified_at: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  },
+
+  findOneUser: (id: string) => {
+    return prisma.users.findMany({
+      where: { id: id },
+      select: {
+        name: true,
+        student: {
+          select: {
+            nis: true,
+            absences: {
+              select: {
+                date: true,
+                absence_time: true,
+                status: true,
+                has_todo: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  },
+
+  updateUser: (id: string, body: UserUpdateType) => {
+    return prisma.users.update({
+      where: { id: id },
+      data: { name: body.name, email: body.email, role: body.role },
+      omit: {
+        email_verified_at: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  },
+};
