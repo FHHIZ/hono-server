@@ -10,6 +10,15 @@ export type Token = {
   role: string;
 };
 
+export type AbsenceQuery = {
+  date_start?: Date;
+  date_end?: Date;
+  classes?: ClassGrade;
+  major?: string;
+  status?: Status;
+  has_todo?: boolean;
+};
+
 export type LoginType = {
   email: string;
   password: string;

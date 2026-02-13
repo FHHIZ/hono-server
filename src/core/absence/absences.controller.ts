@@ -2,8 +2,9 @@ import type { Context } from "hono";
 import BaseController from "../../base/controller.base.js";
 import type { AbsenceType } from "../../type/type.js";
 import { AbsencesService } from "./absences.service.js";
-import { Status } from "../../generated/prisma/index.js";
+import { ClassGrade, Status } from "../../generated/prisma/index.js";
 import { StudentService } from "../student/student.service.js";
+import { AbsenceQuerySchema } from "../../zod/query.js";
 
 class AbsenController extends BaseController {
   constructor() {
@@ -12,13 +13,8 @@ class AbsenController extends BaseController {
 
   getAll = async (c: Context) => {
     try {
-      const query = c.req.query("q");
-      const isValid = Object.values(Status).includes(query as Status);
-
-      const data = await AbsencesService.findAllAbsence(
-        isValid ? (query as Status) : undefined,
-      );
-
+      const query = AbsenceQuerySchema.parse(c.req.query());
+      const data = await AbsencesService.findAllAbsence(query);
       return this.ok(c, "Successfuly get all absence", data);
     } catch (error) {
       return this.badRequest(c, `Failed to get all absence. ${error}`);

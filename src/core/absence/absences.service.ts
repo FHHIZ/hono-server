@@ -1,6 +1,6 @@
-import type { Status } from "../../generated/prisma/index.js";
+import type { ClassGrade, Status } from "../../generated/prisma/index.js";
 import { prisma } from "../../middleware/client.js";
-import type { AbsenceType } from "../../type/type.js";
+import type { AbsenceQuery, AbsenceType } from "../../type/type.js";
 
 export const AbsencesService = {
   findById: (id: string) => {
@@ -12,22 +12,34 @@ export const AbsencesService = {
     });
   },
 
-  findAllAbsence: (query?: Status | undefined) => {
+  findAllAbsence: (query: AbsenceQuery) => {
     return prisma.absence.findMany({
-      where: query
-        ? {
-            status: {
-              equals: query,
-            },
-          }
-        : undefined,
+      where: {
+        student: {
+          class: {
+            classes: query.classes || undefined,
+            major: query.major || undefined,
+          },
+        },
+        absence_time: {
+          gte: query.date_start || undefined,
+          lte: query.date_end || undefined,
+        },
+        status: query.status || undefined,
+        has_todo: query.has_todo || undefined,
+      },
       select: {
         id: true,
         status: true,
         has_todo: true,
         absence_time: true,
-        student: { select: { user: { select: { name: true } } } },
-      },  
+        student: {
+          select: {
+            user: { select: { name: true } },
+            class: { select: { classes: true, major: true } },
+          },
+        },
+      },
     });
   },
 

@@ -16,12 +16,7 @@ export const UserService = {
   findById: (id: string) => {
     return prisma.users.findUnique({
       where: { id: id },
-      omit: {
-        email_verified_at: true,
-        password: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: { id: true, name: true, role: true, email: true },
     });
   },
 
@@ -34,11 +29,12 @@ export const UserService = {
             },
           }
         : undefined,
-      omit: {
-        email_verified_at: true,
-        password: true,
-        createdAt: true,
-        updatedAt: true,
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        email: true,
+        student: { select: { nis: true } },
       },
     });
   },
