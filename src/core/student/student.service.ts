@@ -9,6 +9,7 @@ export const StudentService = {
   createStudent: (body: StudentType) => {
     return prisma.student.create({
       data: { user_id: body.user_id, class_id: body.class_id, nis: body.nis },
+      select: { id: true, nis: true, user: { select: { name: true } } },
     });
   },
 
@@ -23,7 +24,12 @@ export const StudentService = {
             },
           }
         : undefined,
-      omit: { createdAt: true, updatedAt: true },
+      select: {
+        id: true,
+        nis: true,
+        class: { select: { classes: true, major: true } },
+        user: { select: { name: true } },
+      },
     });
   },
 

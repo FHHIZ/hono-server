@@ -4,7 +4,7 @@ import type { UserUpdateType } from "../../type/type.js";
 export const UserService = {
   findByEmail: (email: string) => {
     return prisma.users.findUnique({
-      where: { email },
+      where: { email: email },
       omit: {
         email_verified_at: true,
         createdAt: true,
@@ -16,12 +16,7 @@ export const UserService = {
   findById: (id: string) => {
     return prisma.users.findUnique({
       where: { id: id },
-      omit: {
-        email_verified_at: true,
-        password: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: { id: true, name: true, role: true, email: true },
     });
   },
 
@@ -34,11 +29,12 @@ export const UserService = {
             },
           }
         : undefined,
-      omit: {
-        email_verified_at: true,
-        password: true,
-        createdAt: true,
-        updatedAt: true,
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        email: true,
+        student: { select: { nis: true } },
       },
     });
   },
@@ -53,7 +49,6 @@ export const UserService = {
             nis: true,
             absences: {
               select: {
-                date: true,
                 absence_time: true,
                 status: true,
                 has_todo: true,

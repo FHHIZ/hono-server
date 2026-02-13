@@ -29,7 +29,7 @@ export const TodosService = {
   CreateTodos: (body: TodosType) => {
     return prisma.todoList.create({
       data: {
-        student_class_id: body.student_class_id,
+        student_class_id: body.student_id,
         activity: body.activity,
       },
     });
@@ -39,7 +39,7 @@ export const TodosService = {
     return prisma.todoList.update({
       where: { id: id },
       data: {
-        student_class_id: body.student_class_id,
+        student_class_id: body.student_id,
         activity: body.activity,
       },
     });

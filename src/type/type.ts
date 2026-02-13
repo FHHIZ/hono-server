@@ -10,6 +10,15 @@ export type Token = {
   role: string;
 };
 
+export type AbsenceQuery = {
+  date_start?: Date;
+  date_end?: Date;
+  classes?: ClassGrade;
+  major?: string;
+  status?: Status;
+  has_todo?: boolean;
+};
+
 export type LoginType = {
   email: string;
   password: string;
@@ -38,7 +47,7 @@ export type UserUpdateType = {
 };
 
 export type TodosType = {
-  student_class_id: string;
+  student_id: string;
   activity: string;
 };
 
@@ -55,19 +64,11 @@ export type ClassQuery = {
 };
 
 export type AbsenceType = {
-  student_class_id: string;
+  student_id: string;
   status: Status;
-  student_class_id: string;
+  has_todo?: boolean;
 };
 
-export type updateAbsen = {
-  status: Status;
-  student_class_id: string;
-};
-
-export type ResetPayload = {
-  id: string;
-  exp: number;
 export type StudentType = {
   user_id: string;
   class_id: string;
