@@ -35,7 +35,7 @@ export const StudentService = {
   },
 
   findOneStudent: (id: string) => {
-    return prisma.student.findMany({
+    return prisma.student.findUnique({
       where: { id: id },
       select: {
         id: true,

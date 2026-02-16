@@ -35,7 +35,7 @@ class StudentController extends BaseController {
 
       const data = await StudentService.findOneStudent(id);
 
-      return this.ok(c, "Successfuly get student", data);
+      return this.ok(c, "Successfuly get student", data!);
     } catch (error) {
       return this.badRequest(c, `Failed to get student. ${error}`);
     }

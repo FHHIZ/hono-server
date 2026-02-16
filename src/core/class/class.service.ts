@@ -22,7 +22,7 @@ export const ClassService = {
   },
 
   findOneClass: (id: string) => {
-    return prisma.class.findMany({
+    return prisma.class.findUnique({
       where: { id: id },
       select: {
         classes: true,
@@ -39,7 +39,7 @@ export const ClassService = {
             absences: {
               select: {
                 status: true,
-                date: true,
+                absence_time: true,
               },
             },
           },

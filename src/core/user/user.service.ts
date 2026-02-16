@@ -1,3 +1,4 @@
+import { string } from "zod";
 import { prisma } from "../../middleware/client.js";
 import type { UserUpdateType } from "../../type/type.js";
 
@@ -16,7 +17,18 @@ export const UserService = {
   findById: (id: string) => {
     return prisma.users.findUnique({
       where: { id: id },
-      select: { id: true, name: true, role: true, email: true },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        email: true,
+        student: {
+          select: {
+            id: true,
+            class: { select: { id: true, classes: true, major: true } },
+          },
+        },
+      },
     });
   },
 
@@ -40,7 +52,7 @@ export const UserService = {
   },
 
   findOneUser: (id: string) => {
-    return prisma.users.findMany({
+    return prisma.users.findUnique({
       where: { id: id },
       select: {
         name: true,

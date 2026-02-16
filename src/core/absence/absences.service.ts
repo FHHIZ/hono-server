@@ -43,6 +43,12 @@ export const AbsencesService = {
     });
   },
 
+  findOneAbsence: (id: string) => {
+    return prisma.absence.findUnique({
+      where: { id: id },
+    });
+  },
+
   createAbsence: (body: AbsenceType) => {
     return prisma.absence.create({
       data: {
@@ -57,12 +63,6 @@ export const AbsencesService = {
         absence_time: true,
         student: { select: { user: { select: { name: true } } } },
       },
-    });
-  },
-
-  findOneAbsence: (id: string) => {
-    return prisma.absence.findMany({
-      where: { id: id },
     });
   },
 
