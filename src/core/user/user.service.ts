@@ -14,6 +14,17 @@ export const UserService = {
     });
   },
 
+  findByName: (name: string) => {
+    return prisma.users.findUnique({
+      where: { name: name },
+      omit: {
+        email_verified_at: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  },
+
   findById: (id: string) => {
     return prisma.users.findUnique({
       where: { id: id },

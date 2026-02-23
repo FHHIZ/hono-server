@@ -33,15 +33,22 @@ class UsersController extends BaseController {
 
   getOne = async (c: Context) => {
     try {
-      const id = c.req.param("id");
+      const id = c.req.param("id") || undefined;
+      const name = c.req.query("name");
 
-      if (!id) {
-        return this.badRequest(c, "User id is required");
+      let data;
+      console.log("id is: ", id);
+
+      if (id) {
+        data = await UserService.findOneUser(id);
+      } else if (name) {
+        data = await UserService.findByName(name);
+      } else {
+        return this.badRequest(c, "User id or name is required");
       }
 
-      const data = await UserService.findOneUser(id);
-      if (!data) return this.badRequest(c, "User not found.");
-
+      console.log("apakah", id, name);
+      if (!data) return this.notFound(c, "User not found.");
       return this.ok(c, "Successfuly get user.", data);
     } catch (error) {
       return this.badRequest(c, `Failed to get user. ${error}`);

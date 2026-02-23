@@ -5,7 +5,7 @@ class BaseController {
     return c.json(
       {
         success: true,
-        message: message || "Continue",
+        message: message || "Continue.",
       },
       100,
     );
@@ -15,7 +15,7 @@ class BaseController {
     return c.json(
       {
         success: true,
-        message: message || "Successful",
+        message: message || "Successful.",
         data,
       },
       200,
@@ -30,7 +30,7 @@ class BaseController {
     return c.json(
       {
         success: false,
-        message: message || "Successfully failed",
+        message: message || "Successfully failed.",
       },
       400,
     );
@@ -40,7 +40,7 @@ class BaseController {
     return c.json(
       {
         success: false,
-        message: message || "Unauthorized",
+        message: message || "Unauthorized.",
       },
       401,
     );
@@ -50,7 +50,17 @@ class BaseController {
     return c.json(
       {
         success: false,
-        message: message || "Forbidden",
+        message: message || "Forbidden.",
+      },
+      403,
+    );
+  };
+
+  notFound = (c: Context, message = "") => {
+    return c.json(
+      {
+        success: false,
+        message: message || "Not found.",
       },
       403,
     );
@@ -60,7 +70,7 @@ class BaseController {
     return c.json(
       {
         success: false,
-        message: message || "Successfully failed",
+        message: message || "Successfully failed.",
       },
       422,
     );
@@ -70,7 +80,7 @@ class BaseController {
     return c.json(
       {
         success: false,
-        message: message || "Conflict",
+        message: message || "Conflict.",
       },
       409,
     );

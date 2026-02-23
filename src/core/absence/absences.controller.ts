@@ -29,6 +29,7 @@ class AbsenController extends BaseController {
       }
 
       const data = await AbsencesService.findOneAbsence(id);
+      if (!data) return this.notFound(c, "Absences not found.");
 
       return this.ok(c, "Successfuly get absence", data);
     } catch (error) {
