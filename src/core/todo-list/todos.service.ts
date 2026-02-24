@@ -2,6 +2,13 @@ import { prisma } from "../../middleware/client.js";
 import type { TodosType } from "../../type/type.js";
 
 export const TodosService = {
+
+  findMyTodosToday: (start: Date, end: Date, id: string) => {
+    return prisma.todoList.findFirst({
+      where: { student: { user: { id: id } } , createdAt: { gte: start, lte: end }},
+    });
+  },
+  
   findAllTodos: (start?: Date, end?: Date) => {
     return prisma.todoList.findMany({
       where:
