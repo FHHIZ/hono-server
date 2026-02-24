@@ -2,7 +2,6 @@ import type { Context } from "hono";
 import BaseController from "../../base/controller.base.js";
 import type { AbsenceType } from "../../type/type.js";
 import { AbsencesService } from "./absences.service.js";
-import { ClassGrade, Status } from "../../generated/prisma/index.js";
 import { StudentService } from "../student/student.service.js";
 import { AbsenceQuerySchema } from "../../zod/query.js";
 
@@ -30,6 +29,7 @@ class AbsenController extends BaseController {
       }
 
       const data = await AbsencesService.findOneAbsence(id);
+      if (!data) return this.notFound(c, "Absences not found.");
 
       return this.ok(c, "Successfuly get absence", data);
     } catch (error) {

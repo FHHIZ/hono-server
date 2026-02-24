@@ -16,13 +16,9 @@ export const TodosService = {
     });
   },
 
-  FindOneTodos: (id?: string) => {
-    return prisma.todoList.findMany({
-      where: id
-        ? {
-            id: id,
-          }
-        : undefined,
+  FindOneTodos: (id: string) => {
+    return prisma.todoList.findUnique({
+      where: { id: id },
     });
   },
 

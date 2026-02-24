@@ -27,12 +27,15 @@ class StudentController extends BaseController {
       const id = c.req.param("id");
 
       if (!id) {
-        return this.badRequest(c, "Class id is required");
+        return this.badRequest(c, "Student id is required");
       }
+
+      const isStudent = await StudentService.findById(id);
+      if (!isStudent) return this.badRequest(c, "Student was not found.");
 
       const data = await StudentService.findOneStudent(id);
 
-      return this.ok(c, "Successfuly get student", data);
+      return this.ok(c, "Successfuly get student", data!);
     } catch (error) {
       return this.badRequest(c, `Failed to get student. ${error}`);
     }

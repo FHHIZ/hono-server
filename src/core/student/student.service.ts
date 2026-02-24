@@ -28,16 +28,22 @@ export const StudentService = {
         id: true,
         nis: true,
         class: { select: { classes: true, major: true } },
-        user: { select: { name: true } },
+        user: { select: { name: true, email: true } },
+        _count: { select: { absences: true } },
       },
     });
   },
 
   findOneStudent: (id: string) => {
-    return prisma.student.findMany({
+    return prisma.student.findUnique({
       where: { id: id },
-
-      omit: { createdAt: true, updatedAt: true },
+      select: {
+        id: true,
+        nis: true,
+        class: { select: { classes: true, major: true } },
+        user: { select: { name: true, email: true } },
+        absences: { select: { status: true } },
+      },
     });
   },
 
