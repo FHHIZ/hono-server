@@ -1,8 +1,18 @@
-import type { ClassGrade, Status } from "../../generated/prisma/index.js";
+import { string } from "zod";
 import { prisma } from "../../middleware/client.js";
 import type { AbsenceQuery, AbsenceType } from "../../type/type.js";
 
 export const AbsencesService = {
+  CountMyAbsences: (id: string) => {
+    return prisma.absence.groupBy({
+      where: { student: { user: { id: id } } },
+      by: ["status"],
+      _count: {
+        status: true,
+      },
+    });
+  },
+
   findById: (id: string) => {
     return prisma.absence.findUnique({
       where: { id: id },
@@ -46,6 +56,7 @@ export const AbsencesService = {
   findOneAbsence: (id: string) => {
     return prisma.absence.findUnique({
       where: { id: id },
+      select: { id: true, absence_time: true },
     });
   },
 

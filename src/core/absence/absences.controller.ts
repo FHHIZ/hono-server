@@ -10,6 +10,16 @@ class AbsenController extends BaseController {
     super();
   }
 
+  CountMyAbsences = async (c: Context) => {
+    try {
+      const id = c.get("jwtPayloadId");
+      const data = await AbsencesService.CountMyAbsences(id);
+      return this.ok(c, "Successfuly count your absence.", data);
+    } catch (error) {
+      return this.badRequest(c, `Failed to get all absence. ${error}`);
+    }
+  };
+
   getAll = async (c: Context) => {
     try {
       const query = AbsenceQuerySchema.parse(c.req.query());

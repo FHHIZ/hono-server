@@ -13,12 +13,31 @@ export const TodosService = {
               },
             }
           : undefined,
+      select: {
+        id: true,
+        activity: true,
+        createdAt: true,
+        student: {
+          select: {
+            class: {
+              select: { classes: true, major: true, academicYear: true },
+            },
+            user: { select: { id: true, name: true } },
+          },
+        },
+      },
     });
   },
 
   FindOneTodos: (id: string) => {
     return prisma.todoList.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+        activity: true,
+        createdAt: true,
+        student: { select: { user: true } },
+      },
     });
   },
 

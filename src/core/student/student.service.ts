@@ -9,7 +9,12 @@ export const StudentService = {
   createStudent: (body: StudentType) => {
     return prisma.student.create({
       data: { user_id: body.user_id, class_id: body.class_id, nis: body.nis },
-      select: { id: true, nis: true, user: { select: { name: true } } },
+      select: {
+        id: true,
+        nis: true,
+        user: { select: { name: true } },
+        class: { select: { classes: true, major: true, academicYear: true } },
+      },
     });
   },
 
@@ -42,7 +47,7 @@ export const StudentService = {
         nis: true,
         class: { select: { classes: true, major: true } },
         user: { select: { name: true, email: true } },
-        absences: { select: { status: true } },
+        absences: { select: { status: true, absence_time: true } },
       },
     });
   },
