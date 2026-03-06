@@ -35,6 +35,7 @@ class AuthController extends BaseController {
       const { accessToken, refreshToken } = await generateTokens({
         id: usr.id,
         role: usr.role,
+        studentId: usr.student?.id,
       });
 
       return this.ok(c, "Successfully login.", { accessToken, refreshToken });
@@ -47,10 +48,13 @@ class AuthController extends BaseController {
     try {
       const body = await c.req.json<RegisterType>();
       const userRole = c.get("jwtPayloadRole");
-      const { name, email, password, role } = body;
+      const { name, email, password, role, slug } = body;
 
-      if (!name || !email || !password)
-        return this.badRequest(c, "Please insert name, email, and password.");
+      if (!name || !email || !password || !slug)
+        return this.badRequest(
+          c,
+          "Please insert name, email, password and slug.",
+        );
 
       if (role) roleLevel(userRole, role);
 
@@ -64,10 +68,12 @@ class AuthController extends BaseController {
         email,
         password: pss,
         role: (role as Role) || undefined,
+        slug,
       });
       const { accessToken, refreshToken } = await generateTokens({
         id: res.id,
         role: res.role,
+        studentId: res.student?.id,
       });
 
       return this.ok(c, "Successfully register.", {

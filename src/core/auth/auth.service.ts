@@ -18,26 +18,20 @@ export const AuthService = {
     });
   },
 
-  findByEmailForPassword: (email: string) => {
-    return prisma.users.findUnique({
-      where: { email: email },
-      omit: {
-        password: true,
-        name: true,
-        email_verified_at: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-  },
-
   register: (body: RegisterType) => {
     return prisma.users.create({
       data: {
         name: body.name,
         email: body.email,
         password: body.password,
+        slug: body.slug,
         role: body.role as Role,
+      },
+      select: {
+        id: true,
+        role: true,
+        password: true,
+        student: { select: { id: true } },
       },
     });
   },

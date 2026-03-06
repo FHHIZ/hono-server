@@ -1,14 +1,29 @@
 import { prisma } from "../../middleware/client.js";
-import type { TodosType } from "../../type/type.js";
+import type { CreateTodosType } from "../../type/type.js";
 
 export const TodosService = {
-
-  findMyTodosToday: (start: Date, end: Date, id: string) => {
-    return prisma.todoList.findFirst({
-      where: { student: { user: { id: id } } , createdAt: { gte: start, lte: end }},
+  findMyTodosToday: (id: string, start: Date, end: Date) => {
+    return prisma.todoList.findMany({
+      where: {
+        student_id: id,
+        createdAt: { gte: start, lte: end },
+      },
+      select: {
+        id: true,
+        activity: true,
+        createdAt: true,
+        student: {
+          select: {
+            class: {
+              select: { classes: true, major: true, academicYear: true },
+            },
+            user: { select: { id: true, name: true } },
+          },
+        },
+      },
     });
   },
-  
+
   findAllTodos: (start?: Date, end?: Date) => {
     return prisma.todoList.findMany({
       where:
@@ -48,20 +63,10 @@ export const TodosService = {
     });
   },
 
-  CreateTodos: (body: TodosType) => {
+  CreateTodos: (body: CreateTodosType) => {
     return prisma.todoList.create({
       data: {
-        student_class_id: body.student_id,
-        activity: body.activity,
-      },
-    });
-  },
-
-  UpdateTodos: (id: string, body: TodosType) => {
-    return prisma.todoList.update({
-      where: { id: id },
-      data: {
-        student_class_id: body.student_id,
+        student_id: body.student_id,
         activity: body.activity,
       },
     });

@@ -30,7 +30,7 @@ class StudentController extends BaseController {
         return this.badRequest(c, "Student id is required");
       }
 
-      const isStudent = await StudentService.findById(id);
+      const isStudent = await StudentService.findByIdForNis(id);
       if (!isStudent) return this.badRequest(c, "Student was not found.");
 
       const data = await StudentService.findOneStudent(id);
@@ -50,7 +50,7 @@ class StudentController extends BaseController {
         return this.badRequest(c, "Class id is required");
       }
 
-      const isStudent = await StudentService.findById(body.user_id);
+      const isStudent = await StudentService.findByIdForNis(body.user_id);
       if (!isStudent) return this.badRequest(c, "Student was not found.");
 
       const isUser = await UserService.findById(body.user_id);

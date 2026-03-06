@@ -2,8 +2,18 @@ import { prisma } from "../../middleware/client.js";
 import type { StudentType } from "../../type/type.js";
 
 export const StudentService = {
-  findById: (id: string) => {
-    return prisma.student.findUnique({ where: { id: id } });
+  findByIdForNis: (id: string) => {
+    return prisma.student.findUnique({
+      where: { id: id },
+      select: { nis: true },
+    });
+  },
+
+  findByUserIdForStudentId: (id: string) => {
+    return prisma.student.findFirst({
+      where: { user: { id: id } },
+      select: { id: true },
+    });
   },
 
   createStudent: (body: StudentType) => {
@@ -34,7 +44,6 @@ export const StudentService = {
         nis: true,
         class: { select: { classes: true, major: true } },
         user: { select: { name: true, email: true } },
-        _count: { select: { absences: true } },
       },
     });
   },

@@ -11,6 +11,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.admin,
+      slug: "endmin",
     },
     {
       name: "Chen Qianyu",
@@ -18,6 +19,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.teacher,
+      slug: "chenqianyu",
     },
     {
       name: "Perlica",
@@ -25,6 +27,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.teacher,
+      slug: "perlica",
     },
     {
       name: "Joachim Nokianvirtanen",
@@ -32,6 +35,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.teacher,
+      slug: "welt",
     },
     {
       name: "Will Serfort",
@@ -39,6 +43,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.student,
+      slug: "will",
     },
     {
       name: "Shun Mizushino",
@@ -46,6 +51,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.student,
+      slug: "aurafarmer",
     },
     {
       name: "Fushiguro Megumi",
@@ -53,6 +59,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.student,
+      slug: "potentialman",
     },
     {
       name: "Light Yagami",
@@ -60,6 +67,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.student,
+      slug: "kira",
     },
     {
       name: "Ryuzaki",
@@ -67,6 +75,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.student,
+      slug: "l",
     },
     {
       name: "Midoriya Izuku",
@@ -74,6 +83,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.student,
+      slug: "deku",
     },
     {
       name: "Hakari Atsuko",
@@ -81,6 +91,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.student,
+      slug: "hakariatsuko",
     },
     {
       name: "Oguri Topi",
@@ -88,6 +99,7 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.student,
+      slug: "fatfuu",
     },
     {
       name: "Himmel",
@@ -95,6 +107,15 @@ async function createUsers() {
       email_verified_at: new Date(),
       password: await bcrypt.hash("password", 12),
       role: Role.student,
+      slug: "wielinoino",
+    },
+    {
+      name: "Zoro",
+      email: "unregister@example.com",
+      email_verified_at: new Date(),
+      password: await bcrypt.hash("password", 12),
+      role: Role.unregistered,
+      slug: "mosshair",
     },
   ];
 }

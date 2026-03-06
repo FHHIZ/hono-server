@@ -18,6 +18,7 @@ datasource db {
 model Users {
   id                String    @id @default(uuid())
   name              String    @unique
+  slug              String?   @unique
   email             String    @unique
   email_verified_at DateTime?
   password          String
@@ -43,22 +44,23 @@ model Student {
 }
 
 model Absence {
-  id               String    @id @default(uuid())
-  student_class_id String
-  absence_time     DateTime? @default(now())
-  status           Status    @default(unexcused)
-  has_todo         Boolean   @default(false)
+  id           String    @id @default(uuid())
+  student_id   String
+  absence_time DateTime?
+  status       Status    @default(unexcused)
+  description  String?
+  has_todo     Boolean   @default(false)
 
-  student Student @relation(fields: [student_class_id], references: [id])
+  student Student @relation(fields: [student_id], references: [id])
 }
 
 model TodoList {
-  id               String   @id @default(uuid())
-  student_class_id String
-  activity         String
-  createdAt        DateTime @default(now())
+  id         String   @id @default(uuid())
+  student_id String
+  activity   String
+  createdAt  DateTime @default(now())
 
-  student Student @relation(fields: [student_class_id], references: [id])
+  student Student @relation(fields: [student_id], references: [id])
 }
 
 model Class {

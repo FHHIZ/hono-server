@@ -6,6 +6,17 @@ export const ClassService = {
     return prisma.class.findUnique({ where: { id: id } });
   },
 
+  findSpecificClass: (query: ClassQuery) => {
+    return prisma.class.findMany({
+      where: {
+        classes: query.class,
+        major: query.major,
+        academicYear: query.academic_year,
+      },
+      select: { id: true },
+    });
+  },
+
   findAllClass: (query: ClassQuery) => {
     return prisma.class.findMany({
       where: query

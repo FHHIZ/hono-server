@@ -58,6 +58,9 @@ class ClassController extends BaseController {
           academicYear: academicYear,
         };
 
+        const nganu = await ClassService.findSpecificClass(data);
+        if (nganu.length >= 1) return this.badRequest(c, "Can`t make same class.");
+
         const res = await ClassService.createClass(data);
         return this.ok(c, "Successfully create class.", res);
       } else {
