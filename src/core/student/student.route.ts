@@ -4,7 +4,7 @@ import StudentController from "./student.controller.js";
 
 const SC = new StudentController();
 export const StudentRoute = new Hono()
-  .get("/get-all", isAuthenticated(), SC.getAll)
-  .get("/get-one/:id", isAuthenticated(), SC.getOne)
-  .post("/create", isAuthenticated(["admin", "teacher"]), SC.Create)
-  .post("/update", isAuthenticated(["admin", "teacher"]), SC.Update);
+  .get("/get-all", isAuthenticated(), SC.GetAll)
+  .get("/get-one/:id", isAuthenticated(), SC.GetOne)
+  .post("/create", isAuthenticated(["ADMIN", "TEACHER"]), SC.Create)
+  .post("/update", isAuthenticated(["ADMIN", "TEACHER"]), SC.Update);

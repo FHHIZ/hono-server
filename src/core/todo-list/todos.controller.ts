@@ -3,8 +3,9 @@ import BaseController from "../../base/controller.base.js";
 import { TodosService } from "./todos.service.js";
 import type { TodosType } from "../../type/type.js";
 import type { Role } from "../../generated/prisma/index.js";
-import { getTodayRangeWIB } from "../../helpers/todayTime.js";
+import { DateHelpers } from "../../helpers/dateWIB.js";
 import { StudentService } from "../student/student.service.js";
+import { AbsencesService } from "../absence/absences.service.js";
 
 class TodosController extends BaseController {
   constructor() {
@@ -14,17 +15,9 @@ class TodosController extends BaseController {
   MyTodoToday = async (c: Context) => {
     try {
       const id = c.get("jwtPayloadStudentId");
-      const role: Role = c.get("jwtPayloadRole");
+      if (!id) return this.badRequest(c, "Student id is required.");
 
-      if (!id) {
-        return this.badRequest(c, "Student id is required.");
-      } else if (role !== "student") {
-        return this.badRequest(c, "This feature is supposed for student only!");
-      }
-
-      const { start, end } = getTodayRangeWIB();
-
-      const data = await TodosService.findMyTodosToday(id, start, end);
+      const data = await TodosService.FindMyTodosToday(id);
 
       return this.ok(c, "Successfuly show todo for today.", data!);
     } catch (error) {
@@ -32,15 +25,13 @@ class TodosController extends BaseController {
     }
   };
 
-  getAll = async (c: Context) => {
+  GetAll = async (c: Context) => {
     try {
-      const startRaw = c.req.query("start");
-      const endRaw = c.req.query("end");
+      const date = c.req.query("date");
 
-      const start = startRaw ? new Date(startRaw) : undefined;
-      const end = endRaw ? new Date(endRaw) : undefined;
-
-      const data = await TodosService.findAllTodos(start, end);
+      const data = await TodosService.FindAllTodosWithQuery(
+        date ? new Date(date) : undefined,
+      );
 
       return this.ok(c, "Successfuly get all todos", data);
     } catch (error) {
@@ -48,17 +39,15 @@ class TodosController extends BaseController {
     }
   };
 
-  getOne = async (c: Context) => {
+  GetOne = async (c: Context) => {
     try {
       const id = c.req.param("id");
+      if (!id) return this.badRequest(c, "User id is required");
 
-      if (!id) {
-        return this.badRequest(c, "User id is required");
-      }
+      const data = await TodosService.FindOneTodosById(id);
+      if (!data) return this.badRequest(c, "Invalid user id");
 
-      const data = await TodosService.FindOneTodos(id);
-
-      return this.ok(c, "Successfuly get todos", data!);
+      return this.ok(c, "Successfuly get todos", data);
     } catch (error) {
       return this.badRequest(c, `Failed to get todos. ${error}`);
     }
@@ -68,15 +57,27 @@ class TodosController extends BaseController {
     try {
       const id = c.get("jwtPayloadId");
       const body = await c.req.json<TodosType>();
+      const { activity } = body;
 
-      const student_id = await StudentService.findByUserIdForStudentId(id);
-      if (!student_id?.id)
-        return this.badRequest(c, "This feature x  for students!");
+      const student_id = c.get("jwtPayloadStudentId");
+      if (!student_id)
+        return this.badRequest(c, "This feature is for students!");
 
-      const merge = { ...body, student_id: student_id?.id };
+      const absence_id = await AbsencesService.FindMyAbsenceToday(student_id);
+      if (!absence_id)
+        return this.badRequest(
+          c,
+          "We couldn't find your attendance for today. Please check in first!",
+        );
 
-      const data = await TodosService.CreateTodos(merge);
-      return this.ok(c, "Successfuly create todos", data);
+      const data = {
+        id,
+        activity,
+        absence_id: absence_id?.id,
+      };
+
+      const res = await TodosService.Create(data);
+      return this.ok(c, "Successfuly create todos", res);
     } catch (error) {
       return this.badRequest(c, `Failed to create todos. ${error}`);
     }

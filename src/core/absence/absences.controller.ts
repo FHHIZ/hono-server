@@ -3,8 +3,9 @@ import BaseController from "../../base/controller.base.js";
 import { AbsencesService } from "./absences.service.js";
 import { AbsenceQuerySchema } from "../../zod/query.js";
 import { TodosService } from "../todo-list/todos.service.js";
-import { getTimeWIB, getTodayRangeWIB } from "../../helpers/todayTime.js";
-import type { Role, Status } from "../../generated/prisma/index.js";
+import { DateHelpers } from "../../helpers/dateWIB.js";
+import type { AttendanceStatus } from "../../generated/prisma/index.js";
+import type { UpdateAbsenceTypeByAdmin } from "../../type/type.js";
 
 class AbsenController extends BaseController {
   constructor() {
@@ -14,9 +15,10 @@ class AbsenController extends BaseController {
   ShowMyAbsences = async (c: Context) => {
     try {
       const id = c.get("jwtPayloadStudentId");
-      const { start, end } = getTodayRangeWIB();
-      const data = await AbsencesService.findMyAbsenceToday(id, start, end);
-      return this.ok(c, "Successfuly get your absence.", data!);
+      if (!id) return this.notFound(c, "Student id not found!");
+      const data = await AbsencesService.FindMyAbsenceToday(id);
+      if (!data) return this.notFound(c, "Absence today");
+      return this.ok(c, "Successfuly get your absence summary.", data);
     } catch (error) {
       return this.badRequest(c, `Failed to get all absence. ${error}`);
     }
@@ -25,7 +27,6 @@ class AbsenController extends BaseController {
   CountMyAbsences = async (c: Context) => {
     try {
       const id = c.get("jwtPayloadStudentId");
-      console.log(id);
       const data = await AbsencesService.CountMyAbsences(id);
       return this.ok(c, "Successfuly count your absence.", data);
     } catch (error) {
@@ -33,17 +34,17 @@ class AbsenController extends BaseController {
     }
   };
 
-  getAll = async (c: Context) => {
+  GetAll = async (c: Context) => {
     try {
       const query = AbsenceQuerySchema.parse(c.req.query());
-      const data = await AbsencesService.findAllAbsence(query);
+      const data = await AbsencesService.FindAllAbsenceSummaryWithQuery(query);
       return this.ok(c, "Successfuly get all absence", data);
     } catch (error) {
       return this.badRequest(c, `Failed to get all absence. ${error}`);
     }
   };
 
-  getOne = async (c: Context) => {
+  GetOne = async (c: Context) => {
     try {
       const id = c.req.param("id");
 
@@ -51,7 +52,7 @@ class AbsenController extends BaseController {
         return this.badRequest(c, "Absence id is required");
       }
 
-      const data = await AbsencesService.findOneAbsence(id);
+      const data = await AbsencesService.FindOneAbsenceDetailById(id);
       if (!data) return this.notFound(c, "Absences not found.");
 
       return this.ok(c, "Successfuly get absence", data);
@@ -61,48 +62,72 @@ class AbsenController extends BaseController {
   };
 
   UpdateByStudent = async (c: Context) => {
+    const { BlockRequestOnWeekend, CheckIsLate } = DateHelpers();
     try {
-      const role: Role = c.get("jwtPayloadRole");
+      BlockRequestOnWeekend();
+      const id_student = c.get("jwtPayloadStudentId");
+      if (!id_student) return this.forbidden(c, "Id student not found.");
 
-      const body = await c.req.json<{ status: Status }>();
-      const idStudent = c.get("jwtPayloadStudentId");
-      const idAbsence = c.req.param("id");
-      const { status } = body;
+      const response = await AbsencesService.FindMyAbsenceToday(id_student);
 
-      if (status === "unexcused") return this.badRequest(c, "Invalid action.");
-      if (!status || !idAbsence)
-        return this.badRequest(c, "Please insert status.");
-      if (role !== "student")
-        return this.badRequest(c, "This feature is supposed for student only!");
-
-      // buat hari dan rangenya
-      const { start, end } = getTodayRangeWIB();
-      const time = getTimeWIB();
+      const id_absence = response?.id;
+      if (!id_absence) return this.badRequest(c, "Id absence not found.");
 
       // cek apaakah todo hari ini sudah ada dua
-      const todo = await TodosService.findMyTodosToday(idStudent, start, end);
-      const min2Todo = todo.length >= 2;
-      if (!min2Todo && status === "present") {
+      const todo = await TodosService.FindMyTodosToday(id_student);
+      const min2Todo = todo?.todo_list.length || 0 >= 2;
+      if (!min2Todo) {
         return this.badRequest(
           c,
-          `You need ${2 - todo.length} To Do List for doing absences!`,
+          `You need ${2 - (todo?.todo_list.length || 0)} To Do List for doing absences!`,
         );
       }
 
       // cek apakah hari ini sudah absen
-      const absences = await AbsencesService.findByIdForMyAbsence(idAbsence);
-
-      if (absences?.status !== "unexcused") {
+      const pendingAbsence =
+        await AbsencesService.GetPendingAbsence(id_absence);
+      if (!pendingAbsence)
         return this.badRequest(c, `You already absences today!`);
-      }
+
+      const res = await AbsencesService.UpdateAbsenceByStudent(
+        id_absence,
+        pendingAbsence,
+        pendingAbsence == "ABSENT" && CheckIsLate() ? "LATE" : "PRESENT",
+      );
+      return this.ok(c, "Successfully create absence.", res);
+    } catch (error) {
+      return this.badRequest(c, `Failed to create absence. ${error}`);
+    }
+  };
+
+  Reject = async (c: Context) => {
+    try {
+      const id = c.req.param("id");
+      const body = await c.req.json<{ teacher_note: string }>();
+      const absences = await AbsencesService.GetPendingAbsence(id);
+      if (!absences) return this.badRequest(c, "Invalid Id absence.");
 
       const data = {
-        id: idStudent,
-        status: status,
-        absence_time: absences?.absence_time || getTimeWIB(),
+        status: "RESUBMIT" as AttendanceStatus,
+        has_todo: false,
+        teacher_note: body.teacher_note,
       };
 
-      const res = await AbsencesService.updateAbsenceByStudent(idAbsence, data);
+      const res = await AbsencesService.UpdateAbsence(id, data);
+      return this.ok(c, "Successfully create absence.", res);
+    } catch (error) {
+      return this.badRequest(c, `Failed to create absence. ${error}`);
+    }
+  };
+
+  Update = async (c: Context) => {
+    try {
+      const id = c.req.param("id");
+      if (!id) return this.notFound(c, "Absence id not found!");
+      const body = await c.req.json<UpdateAbsenceTypeByAdmin>();
+
+      const res = AbsencesService.UpdateAbsence(id, body);
+
       return this.ok(c, "Successfully create absence.", res);
     } catch (error) {
       return this.badRequest(c, `Failed to create absence. ${error}`);

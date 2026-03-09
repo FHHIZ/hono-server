@@ -1,4 +1,8 @@
-import { ClassGrade, Status, type Role } from "../generated/prisma/index.js";
+import {
+  ClassGrade,
+  AttendanceStatus,
+  type Role,
+} from "../generated/prisma/index.js";
 
 export type Token = {
   aud: string;
@@ -16,7 +20,7 @@ export type AbsenceQuery = {
   date_end?: Date;
   classes?: ClassGrade;
   major?: string;
-  status?: Status;
+  status?: AttendanceStatus;
   has_todo?: boolean;
 };
 
@@ -42,9 +46,16 @@ export type ResetType = {
   exp: number;
 };
 
-export type UserUpdateType = {
+export type EditMyProfileType = {
   name: string;
   email: string;
+  slug: string;
+};
+
+export type EditProfileType = {
+  name: string;
+  email: string;
+  slug: string;
   role: Role;
 };
 
@@ -53,7 +64,7 @@ export type TodosType = {
 };
 
 export type CreateTodosType = {
-  student_id: string;
+  absence_id: string;
   activity: string;
 };
 
@@ -71,19 +82,23 @@ export type ClassQuery = {
 
 export type CreateManyAbsenceType = {
   student_id: string;
-  status: Status;
-  absence_time: Date;
-  has_todo: boolean;
+  absence_time: any;
+  absence_date: any;
 };
 
 export type UpdateAbsenceType = {
-  id: string;
-  status: Status;
+  status: AttendanceStatus;
+};
+
+export type UpdateAbsenceTypeByAdmin = {
+  status?: AttendanceStatus;
+  has_todo?: boolean;
+  teacher_note?: string;
   absence_time?: Date;
 };
 
 export type StudentType = {
   user_id: string;
   class_id: string;
-  nis: number;
+  nis: string;
 };

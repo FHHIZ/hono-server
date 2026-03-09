@@ -1,11 +1,12 @@
 import { sign, verify } from "hono/jwt";
+import type { Role } from "../generated/prisma/index.js";
 const accessjwt = process.env.ACCESS_SECRET!;
 const refreshjwt = process.env.REFRESH_SECRET!;
 const restartjwt = process.env.REFRESH_SECRET!;
 
 export const generateTokens = async (user: {
   id: string;
-  role: string;
+  role: Role;
   studentId?: string;
 }) => {
   const accessToken = await sign(
@@ -44,7 +45,7 @@ export const generateTokens = async (user: {
 export async function accessSession(token: string) {
   const data = (await verify(token, accessjwt, "HS256")) as {
     id: string;
-    role: string;
+    role: Role;
     studentId: string;
   };
   return { data };
@@ -53,7 +54,7 @@ export async function accessSession(token: string) {
 export async function refreshSession(token: string) {
   const data = (await verify(token, refreshjwt, "HS256")) as {
     id: string;
-    role: string;
+    role: Role;
     studentId: string;
   };
 
@@ -69,7 +70,7 @@ export async function refreshSession(token: string) {
 export async function resetSession(token: string) {
   const data = (await verify(token, restartjwt, "HS256")) as {
     id: string;
-    role: string;
+    role: Role;
     studentId: string;
   };
 

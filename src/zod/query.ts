@@ -1,5 +1,5 @@
 import z from "zod";
-import { ClassGrade, Status } from "../generated/prisma/index.js";
+import { ClassGrade, AttendanceStatus } from "../generated/prisma/index.js";
 
 export const AbsenceQuerySchema = z.object({
   student_id: z.string().optional(),
@@ -7,6 +7,6 @@ export const AbsenceQuerySchema = z.object({
   date_end: z.coerce.date().optional(),
   classes: z.enum(ClassGrade).optional(),
   major: z.string().optional(),
-  status: z.enum(Status).optional(),
+  status: z.enum(AttendanceStatus).optional(),
   has_todo: z.preprocess((val) => val === "true", z.boolean()).optional(),
 });

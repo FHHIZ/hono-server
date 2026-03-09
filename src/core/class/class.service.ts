@@ -2,22 +2,23 @@ import { prisma } from "../../middleware/client.js";
 import type { ClassQuery, ClassType } from "../../type/type.js";
 
 export const ClassService = {
-  findById: (id: string) => {
-    return prisma.class.findUnique({ where: { id: id } });
+  IsClassExist: async (id: string) => {
+    const count = await prisma.class.count({ where: { id: id } });
+    return count > 0;
   },
 
-  findSpecificClass: (query: ClassQuery) => {
-    return prisma.class.findMany({
+  FindClassMatch: async (body: ClassType) => {
+    const count = await prisma.class.count({
       where: {
-        classes: query.class,
-        major: query.major,
-        academicYear: query.academic_year,
+        classes: body.classes,
+        major: body.major,
+        academicYear: body.academicYear,
       },
-      select: { id: true },
     });
+    return count > 0;
   },
 
-  findAllClass: (query: ClassQuery) => {
+  FindAllClassSummaryWithId: (query: ClassQuery) => {
     return prisma.class.findMany({
       where: query
         ? {
@@ -32,7 +33,7 @@ export const ClassService = {
     });
   },
 
-  findOneClass: (id: string) => {
+  FindOneClassDetailWithId: (id: string) => {
     return prisma.class.findUnique({
       where: { id: id },
       select: {
@@ -59,7 +60,7 @@ export const ClassService = {
     });
   },
 
-  createClass: (body: ClassType) => {
+  CreateClass: (body: ClassType) => {
     return prisma.class.create({
       data: {
         classes: body.classes,
@@ -69,7 +70,7 @@ export const ClassService = {
     });
   },
 
-  updateClass: (id: string, body: ClassType) => {
+  UpdateClass: (id: string, body: ClassType) => {
     return prisma.class.update({
       where: { id: id },
       data: {

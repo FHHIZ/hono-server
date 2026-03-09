@@ -1,31 +1,28 @@
 import { prisma } from "../../middleware/client.js";
-import type { UserUpdateType } from "../../type/type.js";
+import type { EditMyProfileType, EditProfileType } from "../../type/type.js";
 
 export const UserService = {
-  findByEmail: (email: string) => {
-    return prisma.users.findUnique({
-      where: { email: email },
-      select: {
-        id: true,
-        role: true,
-        password: true,
-        student: { select: { id: true } },
-      },
-    });
+  IsUserExist: async (id: string) => {
+    const count = await prisma.users.count({ where: { id: id } });
+    return count > 0;
   },
 
-  findBySlug: (slug: string) => {
-    return prisma.users.findUnique({
-      where: { slug: slug },
-      omit: {
-        email_verified_at: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+  IsNameExist: async (name: string) => {
+    const count = await prisma.users.count({ where: { name: name } });
+    return count > 0;
   },
 
-  findById: (id: string) => {
+  IsEmailExist: async (email: string) => {
+    const count = await prisma.users.count({ where: { email: email } });
+    return count > 0;
+  },
+
+  IsSlugExist: async (slug: string) => {
+    const count = await prisma.users.count({ where: { slug: slug } });
+    return count > 0;
+  },
+
+  FindMyProfileSummaryById: (id: string) => {
     return prisma.users.findUnique({
       where: { id: id },
       select: {
@@ -33,6 +30,7 @@ export const UserService = {
         name: true,
         role: true,
         email: true,
+        slug: true,
         student: {
           select: {
             id: true,
@@ -43,7 +41,7 @@ export const UserService = {
     });
   },
 
-  findAllUser: (query?: string) => {
+  FindAllProfileSummaryWithQuery: (query?: string) => {
     return prisma.users.findMany({
       where: query
         ? {
@@ -57,24 +55,29 @@ export const UserService = {
         name: true,
         role: true,
         email: true,
+        slug: true,
         student: { select: { nis: true } },
       },
     });
   },
 
-  findOneUser: (id: string) => {
-    return prisma.users.findUnique({
-      where: { id: id },
+  FindOneProfileDetailByIdOrSlug: (param: string) => {
+    return prisma.users.findFirst({
+      where: {
+        OR: [{ id: param }, { slug: param }],
+      },
       select: {
         name: true,
         student: {
           select: {
             nis: true,
             absences: {
+              where: {
+                absence_date: new Date(), // Hanya ambil absen hari ini
+              },
               select: {
                 absence_time: true,
                 status: true,
-                has_todo: true,
               },
             },
           },
@@ -83,15 +86,28 @@ export const UserService = {
     });
   },
 
-  updateUser: (id: string, body: UserUpdateType) => {
+  UpdateMyProfile: (id: string, body: EditMyProfileType) => {
     return prisma.users.update({
       where: { id: id },
-      data: { name: body.name, email: body.email, role: body.role },
-      omit: {
-        email_verified_at: true,
-        password: true,
-        createdAt: true,
-        updatedAt: true,
+      data: { name: body.name, email: body.email, slug: body.slug },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        slug: true,
+      },
+    });
+  },
+
+  UpdateProfile: (id: string, body: EditProfileType) => {
+    return prisma.users.update({
+      where: { id: id },
+      data: { name: body.name, email: body.email, slug: body.slug },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        slug: true,
       },
     });
   },

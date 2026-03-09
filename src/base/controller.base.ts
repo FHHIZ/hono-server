@@ -62,7 +62,27 @@ class BaseController {
         success: false,
         message: message || "Not found.",
       },
-      403,
+      404,
+    );
+  };
+
+  conflict = (c: Context, message = "") => {
+    return c.json(
+      {
+        success: false,
+        message: message || "Conflict.",
+      },
+      409,
+    );
+  };
+
+  unsupportedMediaType = (c: Context, message = "") => {
+    return c.json(
+      {
+        success: false,
+        message: message || "Unsupported media type.",
+      },
+      415,
     );
   };
 
@@ -76,13 +96,13 @@ class BaseController {
     );
   };
 
-  conflict = (c: Context, message = "") => {
+  ServiceUnavailable = (c: Context, message = "") => {
     return c.json(
       {
         success: false,
-        message: message || "Conflict.",
+        message: message || "Service unavailable.",
       },
-      409,
+      503,
     );
   };
 }

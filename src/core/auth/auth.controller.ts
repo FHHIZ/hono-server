@@ -6,19 +6,18 @@ import {
   generateTokens,
   refreshSession,
   resetSession,
-} from "../../helpers/jwt.js";
-import { getRefreshCookie } from "../../helpers/cookies.js";
+} from "../../helpers/tokenService.js";
+import { getRefreshCookie } from "../../helpers/cookiesHelper.js";
 import type { LoginType, RegisterType } from "../../type/type.js";
 import type { Role } from "../../generated/prisma/index.js";
-import { UserService } from "../user/user.service.js";
-import { roleLevel } from "../../helpers/role.level.js";
+import { roleLevel } from "../../helpers/roleGuard.js";
 
 class AuthController extends BaseController {
   constructor() {
     super();
   }
 
-  login = async (c: Context) => {
+  Login = async (c: Context) => {
     try {
       const body = await c.req.json<LoginType>();
       const { email, password } = body;
@@ -26,7 +25,7 @@ class AuthController extends BaseController {
       if (!email || !password)
         return this.badRequest(c, "Please insert email and password");
 
-      const usr = await UserService.findByEmail(email);
+      const usr = await AuthService.FindCredentialByEmail(email);
       if (!usr) return this.badRequest(c, "Invalid email or password");
 
       const pss = await bcrypt.compare(password, usr.password);
@@ -44,7 +43,7 @@ class AuthController extends BaseController {
     }
   };
 
-  register = async (c: Context, next: Next) => {
+  Register = async (c: Context) => {
     try {
       const body = await c.req.json<RegisterType>();
       const userRole = c.get("jwtPayloadRole");
@@ -58,12 +57,12 @@ class AuthController extends BaseController {
 
       if (role) roleLevel(userRole, role);
 
-      const usr = await UserService.findByEmail(email);
+      const usr = await AuthService.FindCredentialByEmail(email);
       if (usr) return this.conflict(c, "Email already exist.");
 
       const pss = await bcrypt.hash(password, 12);
 
-      const res = await AuthService.register({
+      const res = await AuthService.Register({
         name,
         email,
         password: pss,
@@ -85,7 +84,7 @@ class AuthController extends BaseController {
     }
   };
 
-  refresh = async (c: Context) => {
+  Refresh = async (c: Context) => {
     try {
       var token = getRefreshCookie(c);
       if (!token) {
@@ -100,7 +99,7 @@ class AuthController extends BaseController {
     }
   };
 
-  logout = async (c: Context) => {
+  Logout = async (c: Context) => {
     try {
       const authHeader = c.req.header("Authorization");
       if (!authHeader) return this.unauthorized(c, "You are not logged in.");
@@ -110,15 +109,15 @@ class AuthController extends BaseController {
     }
   };
 
-  changePassword = async (c: Context) => {
+  VerifyBeforeResetPassword = async (c: Context) => {
     try {
       const id: string = c.get("jwtPayloadId");
-      const role: string = c.get("jwtPayloadRole");
+      const role: Role = c.get("jwtPayloadRole");
 
       const body = await c.req.json<{ oldPassword: string }>();
       const { oldPassword } = body;
 
-      const usr = await AuthService.findByIdForPassword(id);
+      const usr = await AuthService.VerifyUserForReset(id);
       if (!usr) return this.badRequest(c, "Invalid action.");
       const isMatch = await bcrypt.compare(oldPassword, usr.password);
       if (!isMatch) return this.badRequest(c, "Invalid password.");
@@ -132,7 +131,7 @@ class AuthController extends BaseController {
     }
   };
 
-  resetPassword = async (c: Context) => {
+  ResetPassword = async (c: Context) => {
     try {
       const token = c.req.header("x-reset-token");
       const body = await c.req.json<{ newPassword: string }>();
@@ -146,10 +145,10 @@ class AuthController extends BaseController {
       if (!isVerify.id) return this.unauthorized(c, "Reset session end!");
 
       const pss = await bcrypt.hash(body.newPassword, 12);
-      const res = await AuthService.updatePassword(isVerify.id, {
+      const res = await AuthService.UpdateUserPassword(isVerify.id, {
         password: pss,
       });
-      return this.ok(c, "Successfuly change password.", res);
+      return this.ok(c, "Successfuly change password.");
     } catch (error) {
       return this.badRequest(c, `Failed to reset password. ${error}`);
     }

@@ -1,22 +1,23 @@
 import { AbsencesService } from "../core/absence/absences.service.js";
 import { StudentService } from "../core/student/student.service.js";
-import type { Status } from "../generated/prisma/index.js";
-import { getTimeWIB, getTodayRangeWIB } from "./todayTime.js";
+import type { AttendanceStatus } from "../generated/prisma/index.js";
+import { DateHelpers } from "./dateWIB.js";
 
 export const generateDailyAbsence = async () => {
   console.log("Generate absences every running.");
-  const { start, end } = getTodayRangeWIB();
 
-  const today = getTimeWIB();
-  const day = today.getDay(); // 0=minggu, 6=sabtu
+  const { GetTimeRangeWib } = DateHelpers();
+  const { end } = GetTimeRangeWib();
 
   // Jika hari ini Minggu (0) atau Sabtu (6), hentikan proses
-  if (day === 0 || day === 6) {
-    return console.log(`Stopped the process because today is ${day}`);
-  }
+  const day = new Date().getDay();
+  if (day === 0 || day === 6)
+    if (day === 0 || day === 6) {
+      return console.log(`Absences is unavailable during weekends`);
+    }
 
   // 1. Cek apakah hari ini sudah pernah di-generate (mencegah duplikat saat restart)
-  const existingAbsences = await AbsencesService.checkAbsenceToday(start, end);
+  const existingAbsences = await AbsencesService.IsInitialAbsencesExistToday();
 
   if (existingAbsences) {
     console.log("Today absences is available, stopping the process...");
@@ -24,7 +25,7 @@ export const generateDailyAbsence = async () => {
   }
 
   // 2. Ambil semua User yang rolenya 'STUDENT' dan punya relasi 'student' (student_id)
-  const students = await StudentService.findAllStudent();
+  const students = await StudentService.FindActiveStudentAccounts();
 
   if (students.length === 0) {
     console.log("Student is unavailable");
@@ -33,14 +34,13 @@ export const generateDailyAbsence = async () => {
 
   // 3. Siapkan data untuk CreateMany
   const dataToInsert = students.map((u) => ({
-    student_id: u.id,
-    status: "unexcused" as Status, // Default: Alpha
-    absence_time: start,
-    has_todo: false,
+    student_id: u.student?.id!,
+    absence_time: end,
+    absence_date: end,
   }));
 
   // 4. Eksekusi Bulk Insert
-  await AbsencesService.createMany(dataToInsert);
+  const data = await AbsencesService.CreateManyInitialAbsences(dataToInsert);
 
-  console.log(`Successfuly generate ${dataToInsert.length} absences template.`);
+  console.log(`Successfuly generate ${data.count} absences template.`);
 };

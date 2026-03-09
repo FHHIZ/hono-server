@@ -5,9 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider      = "prisma-client-js"
-  output        = "../src/generated/prisma"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+  // binaryTargets = ["native", "rhel-openssl-3.0.x"]
   // binaryTargets = ["native", "windows"] // windows only
 }
 
@@ -17,25 +17,24 @@ datasource db {
 }
 
 model Users {
-  id                String    @id @default(uuid())
-  name              String    @unique
-  slug              String?   @unique
-  email             String    @unique
-  email_verified_at DateTime?
-  password          String
-  role              Role      @default(unregistered)
-  student           Student?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                     String   @id @default(cuid())
+  name                   String   @unique @db.VarChar(64)
+  slug                   String   @unique @db.VarChar(10)
+  email                  String   @unique
+  password               String   @db.VarChar(128)
+  role                   Role     @default(UNREGISTERED)
+  student                Student?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  last_password_updateAt DateTime @default(now())
 }
 
 model Student {
-  id       String     @id @default(uuid())
-  user_id  String     @unique
+  id       String    @id @default(cuid())
+  user_id  String    @unique
   class_id String
-  nis      Int
+  nis      String    @unique @db.VarChar(20)
   absences Absence[]
-  todos    TodoList[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -45,47 +44,54 @@ model Student {
 }
 
 model Absence {
-  id           String    @id @default(uuid())
+  id           String           @id @default(cuid())
   student_id   String
-  absence_time DateTime?
-  status       Status    @default(unexcused)
-  description  String?
-  has_todo     Boolean   @default(false)
+  absence_time DateTime         @db.Time
+  absence_date DateTime         @db.Date
+  resubmitAt   DateTime?        @db.Time
+  has_todo     Boolean          @default(false)
+  status       AttendanceStatus @default(ABSENT)
+  teacher_note String?          @db.VarChar(255)
+  todo_list    TodoList[]
 
   student Student @relation(fields: [student_id], references: [id])
+
+  @@unique([student_id, absence_date])
 }
 
 model TodoList {
-  id         String   @id @default(uuid())
-  student_id String
-  activity   String
+  id         String   @id @default(cuid())
+  absence_id String
+  activity   String   @db.VarChar(255)
   createdAt  DateTime @default(now())
 
-  student Student @relation(fields: [student_id], references: [id])
+  absences Absence @relation(fields: [absence_id], references: [id], onDelete: Cascade)
 }
 
 model Class {
-  id           String     @id @default(uuid())
+  id           String     @id @default(cuid())
   classes      ClassGrade
-  major        String
-  academicYear String
+  major        String     @db.VarChar(100)
+  academicYear String     @db.VarChar(9)
   student      Student[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
 
 enum Role {
-  admin
-  teacher
-  student
-  unregistered
+  ADMIN
+  TEACHER
+  STUDENT
+  UNREGISTERED
 }
 
-enum Status {
-  present
-  onLeave
-  ill
-  unexcused
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  LEAVE
+  SICK
+  ABSENT
+  RESUBMIT
 }
 
 enum ClassGrade {

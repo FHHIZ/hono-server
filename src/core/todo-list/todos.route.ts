@@ -4,7 +4,7 @@ import TodosController from "./todos.controller.js";
 
 const TC = new TodosController();
 export const TodosRoute = new Hono()
-  .get("/me", isAuthenticated(), TC.MyTodoToday)
-  .get("/get-all", isAuthenticated(), TC.getAll)
-  .get("/get-one/:id", isAuthenticated(), TC.getOne)
-  .post("/create", isAuthenticated(), TC.Create)
+  .get("/me", isAuthenticated(["STUDENT"]), TC.MyTodoToday)
+  .get("/get-all", isAuthenticated(), TC.GetAll)
+  .get("/get-one/:id", isAuthenticated(), TC.GetOne)
+  .post("/create", isAuthenticated(["STUDENT"]), TC.Create)
