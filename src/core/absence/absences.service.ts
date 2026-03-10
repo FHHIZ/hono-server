@@ -136,7 +136,7 @@ export const AbsencesService = {
       where: { id: id },
       data: {
         status: afterStatus,
-        absence_time: beforeStatus == "RESUBMIT" ? undefined : start,
+        absence_time: beforeStatus == "RESUBMIT" ? undefined : new Date(),
         has_todo: true,
       },
       select: {

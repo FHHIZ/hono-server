@@ -60,10 +60,13 @@ model Absence {
 }
 
 model TodoList {
-  id         String   @id @default(cuid())
-  absence_id String
-  activity   String   @db.VarChar(255)
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  absence_id  String
+  activity    String   @db.VarChar(255)
+  description String?
+  done        Boolean? @default(false)
+  deadline    DateTime?
+  createdAt   DateTime @default(now())
 
   absences Absence @relation(fields: [absence_id], references: [id], onDelete: Cascade)
 }

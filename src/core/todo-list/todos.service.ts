@@ -2,12 +2,14 @@ import { DateHelpers } from "../../helpers/dateWIB.js";
 import { prisma } from "../../middleware/client.js";
 import type { CreateTodosType } from "../../type/type.js";
 
+const { GetTimeRangeWib } = DateHelpers();
+const { start, end } = GetTimeRangeWib();
 export const TodosService = {
   FindMyTodosToday: (id: string) => {
-    return prisma.absence.findUnique({
+    return prisma.absence.findFirst({
       where: {
-        id: id,
-        absence_date: new Date(),
+        student_id: id,
+        absence_date: { lte: end },
       },
       select: {
         has_todo: true,
@@ -65,4 +67,6 @@ export const TodosService = {
       },
     });
   },
+
+  
 };

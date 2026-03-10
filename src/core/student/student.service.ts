@@ -1,5 +1,9 @@
+import { DateHelpers } from "../../helpers/dateWIB.js";
 import { prisma } from "../../middleware/client.js";
 import type { StudentType } from "../../type/type.js";
+
+const { GetTimeRangeWib } = DateHelpers();
+const { end } = GetTimeRangeWib();
 
 export const StudentService = {
   IsStudentExist: async (id: string) => {
@@ -45,7 +49,7 @@ export const StudentService = {
         user: { select: { name: true, email: true } },
         absences: {
           where: {
-            absence_date: new Date(), // Hanya ambil absen hari ini
+            absence_date: { lte: end }, // Hanya ambil absen hari ini
           },
           select: {
             absence_time: true,
@@ -65,7 +69,7 @@ export const StudentService = {
         user: { select: { name: true } },
         class: { select: { classes: true, major: true, academicYear: true } },
         absences: {
-          where: { absence_date: new Date() },
+          where: { absence_date: { lte: end } },
           select: { status: true },
         },
       },
