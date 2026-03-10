@@ -28,9 +28,10 @@ class TodosController extends BaseController {
   GetAll = async (c: Context) => {
     try {
       const date = c.req.query("date");
+      const student = c.req.query("student");
 
       const data = await TodosService.FindAllTodosWithQuery(
-        date ? new Date(date) : undefined,
+        date ? new Date(date) : undefined, student
       );
 
       return this.ok(c, "Successfuly get all todos", data);
@@ -82,6 +83,18 @@ class TodosController extends BaseController {
       return this.badRequest(c, `Failed to create todos. ${error}`);
     }
   };
+
+  UpdateDone = async (c: Context) => {
+    try {
+      const id = c.req.param("id");
+      const IsTodoExist = await TodosService.IsTodoExist(id);
+      if (!IsTodoExist) return this.notFound(c, "Todo not found!")
+      const data = await TodosService.UpdateDone(id)
+      return this.ok(c, "Successfuly update todo", data)
+    } catch (error) {
+      return this.badRequest(c, `Failed to update. ${error}`);
+    }
+  }
 }
 
 export default TodosController;

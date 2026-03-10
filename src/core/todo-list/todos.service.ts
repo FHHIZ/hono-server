@@ -5,6 +5,12 @@ import type { CreateTodosType } from "../../type/type.js";
 const { GetTimeRangeWib } = DateHelpers();
 const { start, end } = GetTimeRangeWib();
 export const TodosService = {
+  IsTodoExist: (id: string) => {
+    return prisma.todoList.count({
+      where: { id: id },
+    });
+  },
+
   FindMyTodosToday: (id: string) => {
     return prisma.absence.findFirst({
       where: {
@@ -25,9 +31,9 @@ export const TodosService = {
     });
   },
 
-  FindAllTodosWithQuery: (now?: Date) => {
+  FindAllTodosWithQuery: (date?: Date, student?: string) => {
     return prisma.absence.findMany({
-      where: { absence_date: now || undefined },
+      where: { absence_date: date, student_id: student },
       select: {
         has_todo: true,
         absence_date: true,
@@ -68,5 +74,15 @@ export const TodosService = {
     });
   },
 
-  
+  UpdateDone: async (id: string) => {
+    const isDone = await prisma.todoList.findUnique({
+      where: { id: id },
+      select: { done: true },
+    });
+    return prisma.todoList.update({
+      where: { id: id },
+      data: { done: !isDone },
+      select: { id: true, done: true }
+    });
+  },
 };
