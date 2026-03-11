@@ -27,11 +27,14 @@ class TodosController extends BaseController {
 
   GetAll = async (c: Context) => {
     try {
-      const date = c.req.query("date");
+      const start = c.req.query("start");
+      const end = c.req.query("end");
       const student = c.req.query("student");
 
       const data = await TodosService.FindAllTodosWithQuery(
-        date ? new Date(date) : undefined, student
+        start ? new Date(start) : undefined,
+        end ? new Date(end) : undefined,
+        student,
       );
 
       return this.ok(c, "Successfuly get all todos", data);
@@ -86,15 +89,48 @@ class TodosController extends BaseController {
 
   UpdateDone = async (c: Context) => {
     try {
-      const id = c.req.param("id");
-      const IsTodoExist = await TodosService.IsTodoExist(id);
-      if (!IsTodoExist) return this.notFound(c, "Todo not found!")
-      const data = await TodosService.UpdateDone(id)
-      return this.ok(c, "Successfuly update todo", data)
+      const TodoId = c.req.param("id");
+      const StudentId = c.get("jwtPayloadStudentId");
+      const ownership = await TodosService.WhoIsOwnerOfTodo(TodoId, StudentId);
+      if (!ownership) return this.notFound(c, "Todo not found!");
+      else if (ownership == 2) return this.forbidden(c);
+      const data = await TodosService.UpdateDone(TodoId);
+      return this.ok(c, "Successfuly update todo", data);
     } catch (error) {
       return this.badRequest(c, `Failed to update. ${error}`);
     }
-  }
+  };
+
+  Update = async (c: Context) => {
+    try {
+      const id = c.req.param("id");
+      const IsTodoExist = await TodosService.IsTodoExist(id);
+      if (!IsTodoExist) return this.notFound(c, "Todo not found!");
+
+      const body = await c.req.json<TodosType>();
+
+      if (!body) return this.badRequest(c, "Activity is required!");
+
+      const data = await TodosService.Update(id, body);
+      return this.ok(c, "Successfuly update todo", data);
+    } catch (error) {
+      return this.badRequest(c, `Failed to update. ${error}`);
+    }
+  };
+
+  Delete = async (c: Context) => {
+    try {
+      const TodoId = c.req.param("id");
+      const StudentId = c.get("jwtPayloadStudentId");
+      const ownership = await TodosService.WhoIsOwnerOfTodo(TodoId, StudentId);
+      if (!ownership) return this.notFound(c, "Todo not found!");
+      else if (ownership == 2) return this.forbidden(c);
+      const data = await TodosService.Delete(TodoId);
+      return this.ok(c, "Successfuly delete todo", data);
+    } catch (error) {
+      return this.badRequest(c, `Failed to update. ${error}`);
+    }
+  };
 }
 
 export default TodosController;

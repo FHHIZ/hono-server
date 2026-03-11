@@ -49,22 +49,7 @@ export const AbsencesService = {
 
   FindAllAbsenceSummaryWithQuery: (query: AbsenceQuery) => {
     return prisma.absence.findMany({
-      where: !query.student_id
-        ? {
-            student: {
-              class: {
-                classes: query.classes || undefined,
-                major: query.major || undefined,
-              },
-            },
-            absence_time: {
-              gte: query.date_start || undefined,
-              lte: query.date_end || undefined,
-            },
-            status: query.status || undefined,
-            has_todo: query.has_todo || undefined,
-          }
-        : { student_id: query.student_id },
+      where: { absence_date: { gte: query.date_start, lte: query.date_end } },
       select: {
         id: true,
         status: true,

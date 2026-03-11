@@ -15,13 +15,8 @@ export type Token = {
 };
 
 export type AbsenceQuery = {
-  student_id?: string;
   date_start?: Date;
   date_end?: Date;
-  classes?: ClassGrade;
-  major?: string;
-  status?: AttendanceStatus;
-  has_todo?: boolean;
 };
 
 export type LoginType = {
@@ -61,6 +56,8 @@ export type EditProfileType = {
 
 export type TodosType = {
   activity: string;
+  description?: string 
+  deadline?: Date
 };
 
 export type CreateTodosType = {

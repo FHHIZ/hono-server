@@ -1,6 +1,7 @@
+import type { Role } from "../../generated/prisma/index.js";
 import { DateHelpers } from "../../helpers/dateWIB.js";
 import { prisma } from "../../middleware/client.js";
-import type { CreateTodosType } from "../../type/type.js";
+import type { CreateTodosType, TodosType } from "../../type/type.js";
 
 const { GetTimeRangeWib } = DateHelpers();
 const { start, end } = GetTimeRangeWib();
@@ -11,56 +12,55 @@ export const TodosService = {
     });
   },
 
+  WhoIsOwnerOfTodo: async (AbsenceId: string, StudentId: string) => {
+    const owner = await prisma.todoList.findUnique({
+      where: { id: AbsenceId },
+      select: { absences: { select: { student_id: true } } },
+    });
+    if (!owner) return false;
+    return owner?.absences.student_id === StudentId ? 1 : 2;
+  },
+
   FindMyTodosToday: (id: string) => {
-    return prisma.absence.findFirst({
+    return prisma.todoList.findMany({
       where: {
-        student_id: id,
-        absence_date: { lte: end },
+        absences: { student_id: id },
+        createdAt: { gte: start, lte: end },
       },
       select: {
-        has_todo: true,
-        absence_date: true,
-        todo_list: {
-          select: {
-            id: true,
-            activity: true,
-            createdAt: true,
-          },
-        },
+        id: true,
+        activity: true,
+        description: true,
+        deadline: true,
+        done: true,
+        createdAt: true,
       },
     });
   },
 
-  FindAllTodosWithQuery: (date?: Date, student?: string) => {
-    return prisma.absence.findMany({
-      where: { absence_date: date, student_id: student },
+  FindAllTodosWithQuery: (start?: Date, end?: Date, id?: string) => {
+    return prisma.todoList.findMany({
+      where: {
+        absences: { student_id: id },
+        createdAt: { gte: start, lte: end },
+      },
       select: {
-        has_todo: true,
-        absence_date: true,
-        todo_list: {
-          select: {
-            id: true,
-            activity: true,
-            createdAt: true,
-          },
-        },
+        id: true,
+        activity: true,
       },
     });
   },
 
   FindOneTodosById: (id: string) => {
-    return prisma.absence.findUnique({
+    return prisma.todoList.findUnique({
       where: { id: id },
       select: {
-        has_todo: true,
-        absence_date: true,
-        todo_list: {
-          select: {
-            id: true,
-            activity: true,
-            createdAt: true,
-          },
-        },
+        id: true,
+        activity: true,
+        description: true,
+        deadline: true,
+        done: true,
+        createdAt: true,
       },
     });
   },
@@ -70,6 +70,33 @@ export const TodosService = {
       data: {
         absence_id: body.absence_id,
         activity: body.activity,
+      },
+      select: {
+        id: true,
+        activity: true,
+        description: true,
+        deadline: true,
+        done: true,
+        createdAt: true,
+      },
+    });
+  },
+
+  Update: async (id: string, data: TodosType) => {
+    return prisma.todoList.update({
+      where: { id: id },
+      data: {
+        activity: data.activity,
+        description: data.description,
+        deadline: data.deadline,
+      },
+      select: {
+        id: true,
+        activity: true,
+        description: true,
+        deadline: true,
+        done: true,
+        createdAt: true,
       },
     });
   },
@@ -81,8 +108,14 @@ export const TodosService = {
     });
     return prisma.todoList.update({
       where: { id: id },
-      data: { done: !isDone },
-      select: { id: true, done: true }
+      data: { done: !isDone?.done },
+      select: { id: true, done: true },
+    });
+  },
+
+  Delete: (id: string) => {
+    return prisma.todoList.delete({
+      where: { id: id },
     });
   },
 };

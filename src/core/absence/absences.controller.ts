@@ -5,7 +5,10 @@ import { AbsenceQuerySchema } from "../../zod/query.js";
 import { TodosService } from "../todo-list/todos.service.js";
 import { DateHelpers } from "../../helpers/dateWIB.js";
 import type { AttendanceStatus } from "../../generated/prisma/index.js";
-import type { UpdateAbsenceTypeByAdmin } from "../../type/type.js";
+import type {
+  AbsenceQuery,
+  UpdateAbsenceTypeByAdmin,
+} from "../../type/type.js";
 
 class AbsenController extends BaseController {
   constructor() {
@@ -36,7 +39,14 @@ class AbsenController extends BaseController {
 
   GetAll = async (c: Context) => {
     try {
-      const query = AbsenceQuerySchema.parse(c.req.query());
+      const start = c.req.query("start");
+      const end = c.req.query("end");
+
+      const query: AbsenceQuery = {
+        date_start: start ? new Date(start) : undefined,
+        date_end: end ? new Date(end) : undefined,
+      };
+
       const data = await AbsencesService.FindAllAbsenceSummaryWithQuery(query);
       return this.ok(c, "Successfuly get all absence", data);
     } catch (error) {
@@ -75,11 +85,11 @@ class AbsenController extends BaseController {
 
       // cek apaakah todo hari ini sudah ada dua
       const todo = await TodosService.FindMyTodosToday(id_student);
-      const min2Todo = todo?.todo_list.length || 0 >= 2;
+      const min2Todo = todo.length || 0 >= 2;
       if (!min2Todo) {
         return this.badRequest(
           c,
-          `You need ${2 - (todo?.todo_list.length || 0)} To Do List for doing absences!`,
+          `You need ${2 - (todo.length || 0)} To Do List for doing absences!`,
         );
       }
 
