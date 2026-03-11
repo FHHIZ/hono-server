@@ -33,7 +33,9 @@ export const StudentService = {
       select: {
         id: true,
         nis: true,
-        class: { select: { classes: true, major: true } },
+        class: {
+          select: { academicYear: true, major: true, classNumber: true },
+        },
         user: { select: { name: true, email: true } },
       },
     });
@@ -45,7 +47,9 @@ export const StudentService = {
       select: {
         id: true,
         nis: true,
-        class: { select: { classes: true, major: true } },
+        class: {
+          select: { academicYear: true, major: true, classNumber: true },
+        },
         user: { select: { name: true, email: true } },
         absences: {
           where: {
@@ -67,7 +71,9 @@ export const StudentService = {
         id: true,
         nis: true,
         user: { select: { name: true } },
-        class: { select: { classes: true, major: true, academicYear: true } },
+        class: {
+          select: { academicYear: true, major: true, classNumber: true },
+        },
         absences: {
           where: { absence_date: { lte: end } },
           select: { status: true },
@@ -84,7 +90,9 @@ export const StudentService = {
         id: true,
         nis: true,
         user: { select: { name: true } },
-        class: { select: { classes: true, major: true, academicYear: true } },
+        class: {
+          select: { academicYear: true, major: true, classNumber: true },
+        },
       },
     });
   },

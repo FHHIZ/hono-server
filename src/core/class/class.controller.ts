@@ -2,7 +2,6 @@ import type { Context } from "hono";
 import BaseController from "../../base/controller.base.js";
 import type { ClassType } from "../../type/type.js";
 import { ClassService } from "./class.service.js";
-import type { ClassGrade } from "../../generated/prisma/index.js";
 
 class ClassController extends BaseController {
   constructor() {
@@ -11,17 +10,17 @@ class ClassController extends BaseController {
 
   GetAll = async (c: Context) => {
     try {
-      const classes = c.req.query("class");
+      const classNumber = c.req.query("class");
       const major = c.req.query("major");
-      const academic_year = c.req.query("academic_year");
+      const academicYear = c.req.query("academicYear");
 
-      if (academic_year && academic_year.length != 9)
-        return this.badRequest(c, "Invalid academic_year.");
+      if (academicYear && academicYear.length != 9)
+        return this.badRequest(c, "Invalid academicYear.");
 
       const query = {
-        class: (classes as ClassGrade) || undefined,
-        major: major || undefined,
-        academic_year: academic_year || undefined,
+        classNumber: Number(classNumber) || undefined,
+        major,
+        academicYear,
       };
 
       const data = await ClassService.FindAllClassSummaryWithId(query);
@@ -50,17 +49,18 @@ class ClassController extends BaseController {
   Create = async (c: Context) => {
     try {
       const body = await c.req.json<ClassType>();
-      const { classes, major, academicYear } = body;
+      const { classNumber, major, academicYear } = body;
 
-      if (!classes || !major || !academicYear)
+      if (!classNumber || !major || !academicYear)
         return this.badRequest(c, "Please insert className, and academicYear.");
       if (academicYear.length != 9)
         return this.badRequest(c, "Invalid academicYear.");
+      if (major.length != 4) return this.badRequest(c, "Invalid major.");
 
       const data = {
-        classes: classes as ClassGrade,
-        major: major,
-        academicYear: academicYear,
+        classNumber,
+        major,
+        academicYear,
       };
 
       const sameClass = await ClassService.FindClassMatch(data);

@@ -1,5 +1,4 @@
 import {
-  ClassGrade,
   AttendanceStatus,
   type Role,
 } from "../generated/prisma/index.js";
@@ -66,15 +65,15 @@ export type CreateTodosType = {
 };
 
 export type ClassType = {
-  classes: ClassGrade;
-  major: string;
   academicYear: string;
+  major: string;
+  classNumber: number;
 };
 
 export type ClassQuery = {
-  class?: ClassGrade;
+  academicYear?: string;
   major?: string;
-  academic_year?: string;
+  classNumber?: number;
 };
 
 export type CreateManyAbsenceType = {

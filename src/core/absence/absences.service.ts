@@ -58,7 +58,7 @@ export const AbsencesService = {
         student: {
           select: {
             user: { select: { name: true } },
-            class: { select: { classes: true, major: true } },
+            class: { select: { academicYear: true, major: true } },
           },
         },
       },
@@ -76,7 +76,7 @@ export const AbsencesService = {
         student: {
           select: {
             user: { select: { name: true } },
-            class: { select: { classes: true, major: true } },
+            class: { select: { academicYear: true, major: true } },
           },
         },
       },

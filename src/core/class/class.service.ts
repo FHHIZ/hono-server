@@ -10,7 +10,7 @@ export const ClassService = {
   FindClassMatch: async (body: ClassType) => {
     const count = await prisma.class.count({
       where: {
-        classes: body.classes,
+        classNumber: body.classNumber,
         major: body.major,
         academicYear: body.academicYear,
       },
@@ -23,9 +23,9 @@ export const ClassService = {
       where: query
         ? {
             AND: [
-              { classes: query.class },
+              { classNumber: query.classNumber },
               { major: query.major },
-              { academicYear: query.academic_year },
+              { academicYear: query.academicYear },
             ],
           }
         : undefined,
@@ -37,9 +37,9 @@ export const ClassService = {
     return prisma.class.findUnique({
       where: { id: id },
       select: {
-        classes: true,
-        major: true,
         academicYear: true,
+        major: true,
+        classNumber: true,
         student: {
           select: {
             nis: true,
@@ -63,9 +63,9 @@ export const ClassService = {
   CreateClass: (body: ClassType) => {
     return prisma.class.create({
       data: {
-        classes: body.classes,
-        major: body.major,
         academicYear: body.academicYear,
+        major: body.major,
+        classNumber: body.classNumber,
       },
     });
   },
@@ -74,9 +74,9 @@ export const ClassService = {
     return prisma.class.update({
       where: { id: id },
       data: {
-        classes: body.classes,
-        major: body.major,
         academicYear: body.academicYear,
+        major: body.major,
+        classNumber: body.classNumber
       },
 
       omit: { createdAt: true, updatedAt: true },

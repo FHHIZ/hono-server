@@ -22,7 +22,7 @@ model Users {
   slug                   String   @unique @db.VarChar(10)
   email                  String   @unique
   password               String   @db.VarChar(128)
-  role                   Role     @default(UNREGISTERED)
+  role                   Role     @default(STUDENT)
   student                Student?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
@@ -73,19 +73,20 @@ model TodoList {
 
 model Class {
   id           String     @id @default(cuid())
-  classes      ClassGrade
-  major        String     @db.VarChar(100)
   academicYear String     @db.VarChar(9)
+  major        String     @db.VarChar(5)
+  classNumber  Int
   student      Student[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+
+  @@unique([academicYear, major, classNumber])
 }
 
 enum Role {
   ADMIN
   TEACHER
   STUDENT
-  UNREGISTERED
 }
 
 enum AttendanceStatus {
@@ -95,10 +96,4 @@ enum AttendanceStatus {
   SICK
   ABSENT
   RESUBMIT
-}
-
-enum ClassGrade {
-  X
-  XI
-  XII
 }

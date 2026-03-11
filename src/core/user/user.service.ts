@@ -34,7 +34,14 @@ export const UserService = {
         student: {
           select: {
             id: true,
-            class: { select: { id: true, classes: true, major: true } },
+            class: {
+              select: {
+                id: true,
+                academicYear: true,
+                major: true,
+                classNumber: true,
+              },
+            },
           },
         },
       },
@@ -53,9 +60,6 @@ export const UserService = {
       select: {
         id: true,
         name: true,
-        role: true,
-        email: true,
-        slug: true,
         student: { select: { nis: true } },
       },
     });
@@ -68,6 +72,7 @@ export const UserService = {
       },
       select: {
         name: true,
+        role: true,
         student: {
           select: {
             nis: true,

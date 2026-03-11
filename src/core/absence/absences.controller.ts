@@ -1,7 +1,6 @@
 import type { Context } from "hono";
 import BaseController from "../../base/controller.base.js";
 import { AbsencesService } from "./absences.service.js";
-import { AbsenceQuerySchema } from "../../zod/query.js";
 import { TodosService } from "../todo-list/todos.service.js";
 import { DateHelpers } from "../../helpers/dateWIB.js";
 import type { AttendanceStatus } from "../../generated/prisma/index.js";
