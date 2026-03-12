@@ -40,10 +40,14 @@ class AbsenController extends BaseController {
     try {
       const start = c.req.query("start");
       const end = c.req.query("end");
+      const major = c.req.query("major")
+      const classNumber = c.req.query("classNumber")
 
       const query: AbsenceQuery = {
         date_start: start ? new Date(start) : undefined,
         date_end: end ? new Date(end) : undefined,
+        major: major,
+        classNumber: Number(classNumber)
       };
 
       const data = await AbsencesService.FindAllAbsenceSummaryWithQuery(query);
@@ -112,6 +116,7 @@ class AbsenController extends BaseController {
   Reject = async (c: Context) => {
     try {
       const id = c.req.param("id");
+      if (!id) return this.badRequest(c, "Id absences");
       const body = await c.req.json<{ teacher_note: string }>();
       const absences = await AbsencesService.GetPendingAbsence(id);
       if (!absences) return this.badRequest(c, "Invalid Id absence.");
@@ -132,7 +137,7 @@ class AbsenController extends BaseController {
   Update = async (c: Context) => {
     try {
       const id = c.req.param("id");
-      if (!id) return this.notFound(c, "Absence id not found!");
+      if (!id) return this.badRequest(c, "Absence id is required");
       const body = await c.req.json<UpdateAbsenceTypeByAdmin>();
 
       const res = AbsencesService.UpdateAbsence(id, body);

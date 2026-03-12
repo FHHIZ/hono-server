@@ -1,7 +1,4 @@
-import {
-  AttendanceStatus,
-  type Role,
-} from "../generated/prisma/index.js";
+import { AttendanceStatus, type Role } from "../generated/prisma/index.js";
 
 export type Token = {
   aud: string;
@@ -16,6 +13,8 @@ export type Token = {
 export type AbsenceQuery = {
   date_start?: Date;
   date_end?: Date;
+  major?: string;
+  classNumber?: number;
 };
 
 export type LoginType = {
@@ -55,8 +54,8 @@ export type EditProfileType = {
 
 export type TodosType = {
   activity: string;
-  description?: string 
-  deadline?: Date
+  description?: string;
+  deadline?: Date;
 };
 
 export type CreateTodosType = {
