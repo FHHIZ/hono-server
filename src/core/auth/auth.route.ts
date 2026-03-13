@@ -17,12 +17,19 @@ export const AuthRoute = new Hono()
     ContentType("JSON"),
     AC.Register,
   )
+  .post(
+    "/register/student",
+    isAuthenticated(["ADMIN"]),
+    ContentType("JSON"),
+    AC.RegisterManyStudent,
+  )
   .get(
     "/refresh", 
     AC.Refresh
   )
   .get(
     "/logout", 
+    isAuthenticated(),
     AC.Logout
   )
   .post(

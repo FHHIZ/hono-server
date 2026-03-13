@@ -1,11 +1,8 @@
 import type { Context } from "hono";
 import BaseController from "../../base/controller.base.js";
 import { TodosService } from "./todos.service.js";
-import type { TodosType } from "../../type/type.js";
-import type { Role } from "../../generated/prisma/index.js";
-import { DateHelpers } from "../../helpers/dateWIB.js";
-import { StudentService } from "../student/student.service.js";
 import { AbsencesService } from "../absence/absences.service.js";
+import { TodoSchema } from "./todos.schema.js";
 
 class TodosController extends BaseController {
   constructor() {
@@ -60,8 +57,10 @@ class TodosController extends BaseController {
   Create = async (c: Context) => {
     try {
       const id = c.get("jwtPayloadId");
-      const body = await c.req.json<TodosType>();
-      const { activity } = body;
+      const json = await c.req.json();
+      const body = TodoSchema.safeParse(json);
+      if (!body.success) return this.badRequest(c, body.error.message);
+      const { activity } = body.data;
 
       const student_id = c.get("jwtPayloadStudentId");
       if (!student_id)
@@ -90,6 +89,7 @@ class TodosController extends BaseController {
   UpdateDone = async (c: Context) => {
     try {
       const TodoId = c.req.param("id");
+      if (!TodoId) return this.badRequest(c, "Please insert todo id.");
       const StudentId = c.get("jwtPayloadStudentId");
       const ownership = await TodosService.WhoIsOwnerOfTodo(TodoId, StudentId);
       if (!ownership) return this.notFound(c, "Todo not found!");
@@ -104,14 +104,15 @@ class TodosController extends BaseController {
   Update = async (c: Context) => {
     try {
       const id = c.req.param("id");
+      if (!id) return this.badRequest(c, "Please insert todo id!");
       const IsTodoExist = await TodosService.IsTodoExist(id);
       if (!IsTodoExist) return this.notFound(c, "Todo not found!");
 
-      const body = await c.req.json<TodosType>();
+      const json = await c.req.json();
+      const body = TodoSchema.safeParse(json);
+      if (!body.success) return this.badRequest(c, body.error.message);
 
-      if (!body) return this.badRequest(c, "Activity is required!");
-
-      const data = await TodosService.Update(id, body);
+      const data = await TodosService.Update(id, body.data);
       return this.ok(c, "Successfuly update todo", data);
     } catch (error) {
       return this.badRequest(c, `Failed to update. ${error}`);
@@ -121,6 +122,7 @@ class TodosController extends BaseController {
   Delete = async (c: Context) => {
     try {
       const TodoId = c.req.param("id");
+      if (!TodoId) return this.badRequest(c, "Please insert todo id.");
       const StudentId = c.get("jwtPayloadStudentId");
       const ownership = await TodosService.WhoIsOwnerOfTodo(TodoId, StudentId);
       if (!ownership) return this.notFound(c, "Todo not found!");

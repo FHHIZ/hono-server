@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import BaseController from "../../base/controller.base.js";
 import type { ClassType } from "../../type/type.js";
 import { ClassService } from "./class.service.js";
+import { ClassSchema } from "./class.validation.js";
 
 class ClassController extends BaseController {
   constructor() {
@@ -48,8 +49,10 @@ class ClassController extends BaseController {
 
   Create = async (c: Context) => {
     try {
-      const body = await c.req.json<ClassType>();
-      const { classNumber, major, academicYear } = body;
+      const json = await c.req.json()
+      const body = ClassSchema.safeParse(json);
+      if (!body.success) return this.badRequest(c, body.error.message);
+      const { academicYear, major, classNumber } = body.data;
 
       if (!classNumber || !major || !academicYear)
         return this.badRequest(c, "Please insert className, and academicYear.");
@@ -75,18 +78,20 @@ class ClassController extends BaseController {
 
   Update = async (c: Context) => {
     try {
-      const id: string = c.req.param("id");
-      const body = await c.req.json<ClassType>();
+      const id = c.req.param("id");
+      const json = await c.req.json()
+      const body = ClassSchema.safeParse(json);
+      if (!body.success) return this.badRequest(c, body.error.message);
 
       if (!id) return this.badRequest(c, "Class id is required.");
 
       const isClass = await ClassService.IsClassExist(id);
       if (!isClass) return this.badRequest(c, "Class not found.");
 
-      const sameClass = await ClassService.FindClassMatch(body);
+      const sameClass = await ClassService.FindClassMatch(body.data);
       if (sameClass) return this.badRequest(c, "Can`t make same class.");
 
-      const data = await ClassService.UpdateClass(id, body);
+      const data = await ClassService.UpdateClass(id, body.data);
 
       return this.ok(c, "Successfuly update class.", data);
     } catch (error) {

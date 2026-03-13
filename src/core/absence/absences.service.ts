@@ -3,7 +3,6 @@ import { DateHelpers } from "../../helpers/dateWIB.js";
 import { prisma } from "../../middleware/client.js";
 import type {
   AbsenceQuery,
-  CreateManyAbsenceType,
   UpdateAbsenceTypeByAdmin,
 } from "../../type/type.js";
 
@@ -99,9 +98,15 @@ export const AbsencesService = {
     return count > 0;
   },
 
-  CreateManyInitialAbsences: (data: CreateManyAbsenceType[]) => {
+  CreateManyInitialAbsences: (studentId: string[]) => {
+    const AbsencesData = studentId.map((s) => ({
+      student_id: s,
+      absence_time: end,
+      absence_date: end,
+    }));
+
     return prisma.absence.createMany({
-      data: data,
+      data: AbsencesData,
       skipDuplicates: true,
     });
   },

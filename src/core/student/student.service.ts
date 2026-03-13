@@ -82,6 +82,18 @@ export const StudentService = {
     });
   },
 
+  CreateManyStudent: async (body: StudentType[]) => {
+    const count = await prisma.student.createMany({
+      data: body,
+      skipDuplicates: true,
+    });
+    const students = await prisma.student.findMany({
+      where: { nis: { in: body.map((e) => e.nis) } },
+      select: { id: true },
+    });
+    return { count: count.count, userIds: students };
+  },
+
   UpdateStudent: (id: string, body: StudentType) => {
     return prisma.student.update({
       where: { id: id },

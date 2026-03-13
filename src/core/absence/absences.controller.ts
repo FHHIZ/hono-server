@@ -8,6 +8,7 @@ import type {
   AbsenceQuery,
   UpdateAbsenceTypeByAdmin,
 } from "../../type/type.js";
+import { RejectSchema, AbsenceSchema } from "./absences.validation.js";
 
 class AbsenController extends BaseController {
   constructor() {
@@ -40,14 +41,14 @@ class AbsenController extends BaseController {
     try {
       const start = c.req.query("start");
       const end = c.req.query("end");
-      const major = c.req.query("major")
-      const classNumber = c.req.query("classNumber")
+      const major = c.req.query("major");
+      const classNumber = c.req.query("classNumber");
 
       const query: AbsenceQuery = {
         date_start: start ? new Date(start) : undefined,
         date_end: end ? new Date(end) : undefined,
         major: major,
-        classNumber: Number(classNumber)
+        classNumber: Number(classNumber),
       };
 
       const data = await AbsencesService.FindAllAbsenceSummaryWithQuery(query);
@@ -117,14 +118,17 @@ class AbsenController extends BaseController {
     try {
       const id = c.req.param("id");
       if (!id) return this.badRequest(c, "Id absences");
-      const body = await c.req.json<{ teacher_note: string }>();
+      const json = await c.req.json();
+      const body = RejectSchema.safeParse(json);
+      if (!body.success) return this.badRequest(c, body.error.message);
+
       const absences = await AbsencesService.GetPendingAbsence(id);
       if (!absences) return this.badRequest(c, "Invalid Id absence.");
 
       const data = {
         status: "RESUBMIT" as AttendanceStatus,
         has_todo: false,
-        teacher_note: body.teacher_note,
+        teacher_note: body.data.teacher_note,
       };
 
       const res = await AbsencesService.UpdateAbsence(id, data);
@@ -138,9 +142,12 @@ class AbsenController extends BaseController {
     try {
       const id = c.req.param("id");
       if (!id) return this.badRequest(c, "Absence id is required");
-      const body = await c.req.json<UpdateAbsenceTypeByAdmin>();
+      const json = await c.req.json();
+      const body = RejectSchema.safeParse(json);
+      if (!body.success) return this.badRequest(c, body.error.message);
 
-      const res = AbsencesService.UpdateAbsence(id, body);
+
+      const res = AbsencesService.UpdateAbsence(id, body.data);
 
       return this.ok(c, "Successfully create absence.", res);
     } catch (error) {

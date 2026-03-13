@@ -27,7 +27,7 @@ export type RegisterType = {
   slug: string;
   email: string;
   password: string;
-  role?: string;
+  isAdmin?: boolean;
 };
 
 export type resetPasswordType = {

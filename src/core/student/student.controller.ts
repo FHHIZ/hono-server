@@ -5,6 +5,7 @@ import { StudentService } from "./student.service.js";
 import { UserService } from "../user/user.service.js";
 import { ClassService } from "../class/class.service.js";
 import { AbsencesService } from "../absence/absences.service.js";
+import { StudentSchema } from "./student.validation.js";
 
 class StudentController extends BaseController {
   constructor() {
@@ -44,8 +45,10 @@ class StudentController extends BaseController {
 
   Create = async (c: Context) => {
     try {
-      const body = await c.req.json<StudentType>();
-      const { user_id, class_id, nis } = body;
+      const json = await c.req.json();
+      const body = StudentSchema.safeParse(json);
+      if (!body.success) return this.badRequest(c, body.error.message);
+      const { user_id, class_id, nis } = body.data;
 
       if (!user_id || !class_id || !nis)
         return this.badRequest(c, "Please insert user_id, class_id and nis");
@@ -56,11 +59,15 @@ class StudentController extends BaseController {
       const isClass = await ClassService.IsClassExist(class_id);
       if (!isClass) return this.badRequest(c, "Class not found.");
 
-      const res = await StudentService.CreateStudent(body);
+      const res = await StudentService.CreateStudent(body.data);
 
       if (!res.absences) {
-        const InitialAbsence = await AbsencesService.Create(res.id)
-        return this.ok(c, "Successfully create student and initial absence", res);
+        const InitialAbsence = await AbsencesService.Create(res.id);
+        return this.ok(
+          c,
+          "Successfully create student and initial absence",
+          res,
+        );
       }
       return this.ok(c, "Successfully create student", res);
     } catch (error) {
@@ -70,21 +77,24 @@ class StudentController extends BaseController {
 
   Update = async (c: Context) => {
     try {
-      const id: string = c.req.param("id");
-      const body = await c.req.json<StudentType>();
+      const id = c.req.param("id");
+      const json = await c.req.json();
+      const body = StudentSchema.safeParse(json);
+      if (!body.success) return this.badRequest(c, body.error.message);
+      const { user_id, class_id } = body.data;
 
       if (!id) return this.badRequest(c, "Class id is required");
 
-      const isStudent = await StudentService.IsStudentExist(body.user_id);
+      const isStudent = await StudentService.IsStudentExist(user_id);
       if (!isStudent) return this.badRequest(c, "Student not found.");
 
-      const isUser = await UserService.IsUserExist(body.user_id);
+      const isUser = await UserService.IsUserExist(user_id);
       if (!isUser) return this.badRequest(c, "User not found.");
 
-      const isClass = await ClassService.IsClassExist(body.class_id);
+      const isClass = await ClassService.IsClassExist(class_id);
       if (!isClass) return this.badRequest(c, "Class not found.");
 
-      const data = await StudentService.UpdateStudent(id, body);
+      const data = await StudentService.UpdateStudent(id, body.data);
 
       return this.ok(c, "Successfuly update student", data);
     } catch (error) {

@@ -32,15 +32,10 @@ export const generateDailyAbsence = async () => {
     return;
   }
 
-  // 3. Siapkan data untuk CreateMany
-  const dataToInsert = students.map((u) => ({
-    student_id: u.student?.id!,
-    absence_time: end,
-    absence_date: end,
-  }));
-
   // 4. Eksekusi Bulk Insert
-  const data = await AbsencesService.CreateManyInitialAbsences(dataToInsert);
+  const data = await AbsencesService.CreateManyInitialAbsences(
+    students.map((u) => u.student?.id!),
+  );
 
   console.log(`Successfuly generate ${data.count} absences template.`);
 };
